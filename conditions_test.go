@@ -1,38 +1,57 @@
 package featureflow_go_sdk
 
 import (
-	//"log"
 	"github.com/DATA-DOG/godog"
+	"errors"
+	"fmt"
+	"strconv"
+	"strings"
 )
 
-type contextType struct {
-	target string
+type conditionsContextType struct {
+	target interface{}
 	targetType  string
-	value string
-	values []string
+	values []interface{}
 	valueType string
 	output bool
 }
 
-var context contextType
+var conditionsTestContext conditionsContextType
 
 func theTargetIsAWithTheValueOf(targetType, target string) error {
-	context.target = target
-	context.targetType = targetType
+	conditionsTestContext.targetType = targetType
+	if targetType == "number"{
+
+		if t, err := strconv.ParseFloat(target, 64); err != nil{
+			return err
+		} else {
+			conditionsTestContext.target = t
+		}
+	} else{
+		conditionsTestContext.target = target
+	}
 	return nil
 }
 
 func theValueIsAWithTheValueOf(valueType, value string) error {
-	context.value = value
-	context.valueType = valueType
+	conditionsTestContext.valueType = valueType
+	if valueType == "number"{
+		if v, err := strconv.ParseFloat(value, 64); err != nil{
+			return err
+		} else {
+			conditionsTestContext.values = []interface{}{v}
+		}
+	} else{
+		conditionsTestContext.values = []interface{}{value}
+	}
 	return nil
 }
 
 func theOperatorTestIsRun(operator string) error {
-	if context.targetType == "string" {
-		context.output = TestString(operator, context.target, []string{context.value})
+	if conditionsTestContext.targetType == "string" || conditionsTestContext.targetType == "number" {
+		conditionsTestContext.output = Test(operator, conditionsTestContext.target, conditionsTestContext.values)
 	} else{
-		return godog.ErrPending
+		return errors.New("Error, operator is not defined")
 	}
 
 	return nil
@@ -40,17 +59,23 @@ func theOperatorTestIsRun(operator string) error {
 
 func theOutputShouldEqual(outputString string) error {
 	var output = outputString == "true"
-	if context.output != output{
-		return godog.ErrUndefined
+
+	if conditionsTestContext.output != output{
+		return fmt.Errorf("Expected %s to equal %s", strconv.FormatBool(conditionsTestContext.output), strconv.FormatBool(output))
 	}
-	return godog.ErrUndefined
+	return nil
 }
 
-func theValueIsAnArrayOfValues(values string) error {
-	return godog.ErrPending
+func theValueIsAnArrayOfValues(valuesString string) error {
+	var values = strings.Split(valuesString, ", ")
+	conditionsTestContext.values = make([]interface{}, len(values))
+	for i := range values {
+		conditionsTestContext.values[i] = values[i]
+	}
+	return nil
 }
 
-func FeatureContext(s *godog.Suite) {
+func ConditionsFeatureContext(s *godog.Suite) {
 	s.Step(`^the target is a "([^"]*)" with the value of "([^"]*)"$`, theTargetIsAWithTheValueOf)
 	s.Step(`^the value is a "([^"]*)" with the value of "([^"]*)"$`, theValueIsAWithTheValueOf)
 	s.Step(`^the operator test "([^"]*)" is run$`, theOperatorTestIsRun)
@@ -58,6 +83,6 @@ func FeatureContext(s *godog.Suite) {
 	s.Step(`^the value is an array of values "([^"]*)"$`, theValueIsAnArrayOfValues)
 
 	s.BeforeScenario(func(interface{}) {
-		context = contextType{}
+		conditionsTestContext = conditionsContextType{}
 	})
 }
