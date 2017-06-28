@@ -1,10 +1,13 @@
 package featureflow_go_sdk
 
+import "errors"
+
 type Value interface{}
 
 type Context interface {
 	GetKey() string
-	GetValues(string) []Value
+	GetValuesForKey(string) []Value
+	GetValueKeys() []string
 }
 
 type ContextBuilder interface {
@@ -40,14 +43,25 @@ func (cb *contextBuilder) Build() Context {
 	}
 }
 
-func NewContextBuilder(Key string) ContextBuilder {
-	return &contextBuilder{key:Key, values: make(map[string][]Value)}
+func NewContextBuilder(Key string) (ContextBuilder, error) {
+	if len(Key) == 0 {
+		return nil, errors.New("A key must be defined")
+	}
+	return &contextBuilder{key:Key, values: make(map[string][]Value)}, nil
 }
 
 func (c *context) GetKey() string {
 	return c.key
 }
 
-func (c *context) GetValues(key string) []Value {
+func (c *context) GetValuesForKey(key string) []Value {
 	return c.values[key]
+}
+
+func (c *context) GetValueKeys() []string {
+	valueKeys := []string{}
+	for key, _ := range c.values{
+		valueKeys = append(valueKeys, key)
+	}
+	return valueKeys
 }

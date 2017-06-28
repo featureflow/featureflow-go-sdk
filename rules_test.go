@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"strconv"
 	"encoding/json"
-	"log"
-	"github.com/davecgh/go-spew/spew"
 )
 
 
@@ -16,6 +14,7 @@ type RulesTestContext struct{
 	rule Rule
 	context_builder ContextBuilder
 	variantValue float64
+	splitKeyVariantResult string
 }
 
 var rulesTestContext RulesTestContext
@@ -36,19 +35,16 @@ func theRuleIsMatchedAgainstTheContext() error {
 
 func theResultFromTheMatchShouldBe(resultStr string) error {
 	result := resultStr == "true"
-	//context := rulesTestContext.context_builder.Build()
 	if result != rulesTestContext.result{
 		return fmt.Errorf("Expected %s to be %s",
-			strconv.FormatBool(result),
 			strconv.FormatBool(rulesTestContext.result),
+			strconv.FormatBool(result),
 		)
 	}
 	return nil
 }
 
 func theContextValuesAre(contextValuesTable *gherkin.DataTable) error {
-
-	spew.Dump(contextValuesTable)
 
 	head := contextValuesTable.Rows[0].Cells
 
@@ -61,7 +57,6 @@ func theContextValuesAre(contextValuesTable *gherkin.DataTable) error {
 			case "key":
 				key = cell.Value
 			case "value":
-				log.Println("the fick", string(cell.Value))
 				if cell.Value[0] == '[' {
 					json.Unmarshal([]byte(cell.Value), &values)
 				} else{
@@ -72,10 +67,8 @@ func theContextValuesAre(contextValuesTable *gherkin.DataTable) error {
 			}
 		}
 		if values != nil {
-			log.Println("---$$---jsaklf-------------", values)
 			rulesTestContext.context_builder = rulesTestContext.context_builder.WithValues(key, values)
 		} else {
-			log.Println("!!!-------------------", value)
 			rulesTestContext.context_builder = rulesTestContext.context_builder.WithValue(key, value)
 		}
 	}
@@ -135,15 +128,21 @@ func theVariantSplitsAre(variantSplits *gherkin.DataTable) error {
 }
 
 func theVariantSplitKeyIsCalculated() error {
-	return godog.ErrPending
+	rulesTestContext.splitKeyVariantResult = GetVariantSplitKey(
+		rulesTestContext.rule.VariantSplits,
+		rulesTestContext.variantValue,
+	)
+	return nil
 }
 
-func theResultingVariantShouldBe(arg1 string) error {
-	return godog.ErrPending
+func theResultingVariantShouldBe(variant string) error {
+	if variant != rulesTestContext.splitKeyVariantResult{
+		return fmt.Errorf("Expected %s to be %s", rulesTestContext.splitKeyVariantResult, variant)
+	}
+	return nil
 }
 
 func RulesFeatureContext(s *godog.Suite) {
-	spew.Dump(s)
 	s.Step(`^the rule is a default rule$`, theRuleIsADefaultRule)
 	s.Step(`^the rule is matched against the context$`, theRuleIsMatchedAgainstTheContext)
 	s.Step(`^the result from the match should be (true|false)$`, theResultFromTheMatchShouldBe)
@@ -156,7 +155,7 @@ func RulesFeatureContext(s *godog.Suite) {
 
 
 	s.BeforeScenario(func(interface{}) {
-
+		context_builder, _ := NewContextBuilder("anonymous")
 		rulesTestContext = RulesTestContext{
 			rule: Rule{
 				DefaultRule: false,
@@ -165,7 +164,7 @@ func RulesFeatureContext(s *godog.Suite) {
 					Conditions: []Condition{},
 				},
 			},
-			context_builder: NewContextBuilder("anonymous"),
+			context_builder: context_builder,
 		}
 	})
 }
