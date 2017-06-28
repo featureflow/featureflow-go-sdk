@@ -1,4 +1,4 @@
-package featureflow_go_sdk
+package featureflow
 
 import (
 	"github.com/DATA-DOG/godog"
@@ -6,13 +6,13 @@ import (
 	"fmt"
 )
 
-type ContextBuilderTestContextType struct {
-	context_builder ContextBuilder
-	context Context
-	error error
+type contextBuilderTestContextType struct {
+	context_builder contextBuilderInterface
+	context         contextInterface
+	error           error
 }
 
-var contextBuilderTestContext ContextBuilderTestContextType
+var contextBuilderTestContext contextBuilderTestContextType
 
 func thereIsAccessToTheContextBuilderModule() error {
 	return nil
@@ -89,6 +89,6 @@ func FeatureContext(s *godog.Suite) {
 	s.Step(`^the builder should throw an error$`, theBuilderShouldThrowAnError)
 
 	s.BeforeScenario(func(interface{}){
-		contextBuilderTestContext = ContextBuilderTestContextType{}
+		contextBuilderTestContext = contextBuilderTestContextType{}
 	})
 }

@@ -1,4 +1,4 @@
-package featureflow_go_sdk
+package featureflow
 
 import (
 	"github.com/DATA-DOG/godog"
@@ -25,13 +25,13 @@ func theSaltIsTheFeatureIsAndTheKeyIs(salt, feature, contextKey string) error {
 }
 
 func theVariantValueIsCalculated() error {
-	hashAlgorithmContext.hashResult = CalculateHash(
+	hashAlgorithmContext.hashResult = calculateHash(
 		hashAlgorithmContext.salt,
 		hashAlgorithmContext.feature,
 		hashAlgorithmContext.contextKey,
 	)
 
-	hashAlgorithmContext.result = GetVariantValue(hashAlgorithmContext.hashResult)
+	hashAlgorithmContext.result = getVariantValue(hashAlgorithmContext.hashResult)
 	return nil
 }
 

@@ -14,4 +14,4 @@
 //	log.Println(myStrings)
 //}
 
-package featureflow_go_sdk
+package featureflow

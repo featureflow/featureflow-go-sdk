@@ -1,11 +1,11 @@
-package featureflow_go_sdk
+package featureflow
 
 import (
 	"strings"
 	"regexp"
 )
 
-func Test(op string, a interface{}, b []interface{}) bool {
+func conditionsTest(op string, a interface{}, b []interface{}) bool {
 	switch op {
 	case "equals":
 		return equals(a, b[0])

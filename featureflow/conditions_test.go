@@ -1,4 +1,4 @@
-package featureflow_go_sdk
+package featureflow
 
 import (
 	"github.com/DATA-DOG/godog"
@@ -49,7 +49,7 @@ func theValueIsAWithTheValueOf(valueType, value string) error {
 
 func theOperatorTestIsRun(operator string) error {
 	if conditionsTestContext.targetType == "string" || conditionsTestContext.targetType == "number" {
-		conditionsTestContext.output = Test(operator, conditionsTestContext.target, conditionsTestContext.values)
+		conditionsTestContext.output = conditionsTest(operator, conditionsTestContext.target, conditionsTestContext.values)
 	} else{
 		return errors.New("Error, operator is not defined")
 	}

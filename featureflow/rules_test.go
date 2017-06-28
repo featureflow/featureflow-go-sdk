@@ -1,4 +1,4 @@
-package featureflow_go_sdk
+package featureflow
 
 import (
 	"github.com/DATA-DOG/godog"
@@ -9,15 +9,15 @@ import (
 )
 
 
-type RulesTestContext struct{
-	result bool
-	rule Rule
-	context_builder ContextBuilder
-	variantValue float64
+type rulesTestContextType struct{
+	result                bool
+	rule                  rule
+	context_builder       contextBuilderInterface
+	variantValue          float64
 	splitKeyVariantResult string
 }
 
-var rulesTestContext RulesTestContext
+var rulesTestContext rulesTestContextType
 
 func theRuleIsADefaultRule() error {
 	rulesTestContext.rule.DefaultRule = true
@@ -25,7 +25,7 @@ func theRuleIsADefaultRule() error {
 }
 
 func theRuleIsMatchedAgainstTheContext() error {
-	rulesTestContext.result = RuleMatches(
+	rulesTestContext.result = ruleMatches(
 		rulesTestContext.rule,
 		rulesTestContext.context_builder.Build(),
 	)
@@ -80,7 +80,7 @@ func theRulesAudienceConditionsAre(audienceConditions *gherkin.DataTable) error 
 	conditions := &rulesTestContext.rule.Audience.Conditions
 
 	for i := 1; i < len(audienceConditions.Rows); i++ {
-		condition := Condition{}
+		condition := condition{}
 		for n, cell := range audienceConditions.Rows[i].Cells {
 			switch head[n].Value {
 			case "operator":
@@ -110,7 +110,7 @@ func theVariantSplitsAre(variantSplits *gherkin.DataTable) error {
 	splits := &rulesTestContext.rule.VariantSplits
 
 	for i := 1; i < len(variantSplits.Rows); i++ {
-		variantSplit := VariantSplit{}
+		variantSplit := variantSplit{}
 		for n, cell := range variantSplits.Rows[i].Cells {
 			switch head[n].Value {
 			case "variantKey":
@@ -128,7 +128,7 @@ func theVariantSplitsAre(variantSplits *gherkin.DataTable) error {
 }
 
 func theVariantSplitKeyIsCalculated() error {
-	rulesTestContext.splitKeyVariantResult = GetVariantSplitKey(
+	rulesTestContext.splitKeyVariantResult = getVariantSplitKey(
 		rulesTestContext.rule.VariantSplits,
 		rulesTestContext.variantValue,
 	)
@@ -156,12 +156,12 @@ func RulesFeatureContext(s *godog.Suite) {
 
 	s.BeforeScenario(func(interface{}) {
 		context_builder, _ := NewContextBuilder("anonymous")
-		rulesTestContext = RulesTestContext{
-			rule: Rule{
+		rulesTestContext = rulesTestContextType{
+			rule: rule{
 				DefaultRule: false,
-				VariantSplits:[]VariantSplit{},
-				Audience: Audience{
-					Conditions: []Condition{},
+				VariantSplits:[]variantSplit{},
+				Audience: audience{
+					Conditions: []condition{},
 				},
 			},
 			context_builder: context_builder,
