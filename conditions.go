@@ -3,7 +3,6 @@ package featureflow_go_sdk
 import (
 	"strings"
 	"regexp"
-	"strconv"
 )
 
 func Test(op string, a interface{}, b []interface{}) bool {
@@ -73,28 +72,20 @@ func in(a interface{}, b []interface{}) bool{
 }
 
 //Numerics
-func greaterThan(aStr interface{}, bStr interface{}) bool{
-	a, _ := strconv.ParseFloat(aStr.(string), 64)
-	b, _ := strconv.ParseFloat(bStr.(string), 64)
-	return a > b
+func greaterThan(a interface{}, b interface{}) bool{
+	return a.(float64) > b.(float64)
 }
 
-func greaterThanOrEqual(aStr interface{}, bStr interface{}) bool{
-	a, _ := strconv.ParseFloat(aStr.(string), 64)
-	b, _ := strconv.ParseFloat(bStr.(string), 64)
-	return a >= b
+func greaterThanOrEqual(a interface{}, b interface{}) bool{
+	return a.(float64) >= b.(float64)
 }
 
-func lessThan(aStr interface{}, bStr interface{}) bool{
-	a, _ := strconv.ParseFloat(aStr.(string), 64)
-	b, _ := strconv.ParseFloat(bStr.(string), 64)
-	return a < b
+func lessThan(a interface{}, b interface{}) bool{
+	return a.(float64) < b.(float64)
 }
 
-func lessThanOrEqual(aStr interface{}, bStr interface{}) bool{
-	a, _ := strconv.ParseFloat(aStr.(string), 64)
-	b, _ := strconv.ParseFloat(bStr.(string), 64)
-	return a <= b
+func lessThanOrEqual(a interface{}, b interface{}) bool{
+	return a.(float64) <= b.(float64)
 }
 
 //Dates

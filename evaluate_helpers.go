@@ -1,14 +1,12 @@
 package featureflow_go_sdk
 
 import (
-	"log"
 	"crypto/sha1"
 	"fmt"
 	"strconv"
 )
 
 func RuleMatches(rule Rule, context Context) bool{
-	log.Println(context.GetValuesForKey("role"))
 	if rule.DefaultRule == true{
 		return true
 	} else {
