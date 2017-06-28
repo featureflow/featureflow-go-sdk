@@ -7,9 +7,9 @@ import (
 )
 
 type contextBuilderTestContextType struct {
-	context_builder contextBuilderInterface
-	context         contextInterface
-	error           error
+	context_builder ContextBuilder
+	context         Context
+	error			error
 }
 
 var contextBuilderTestContext contextBuilderTestContextType
@@ -19,12 +19,12 @@ func thereIsAccessToTheContextBuilderModule() error {
 }
 
 func theBuilderIsInitialisedWithTheKey(key string) error {
-	contextBuilderTestContext.context_builder, contextBuilderTestContext.error = NewContextBuilder(key)
+	contextBuilderTestContext.context_builder = NewContextBuilder(key)
 	return nil
 }
 
 func theContextIsBuiltUsingTheBuilder() error {
-	contextBuilderTestContext.context = contextBuilderTestContext.context_builder.Build()
+	contextBuilderTestContext.context, contextBuilderTestContext.error = contextBuilderTestContext.context_builder.Build()
 	return nil
 }
 
@@ -72,7 +72,7 @@ func theResultContextShouldHaveTheKeyWithValue(key, value string) error {
 }
 
 func theBuilderShouldThrowAnError() error {
-	if contextBuilderTestContext.error == nil {
+	if _, err := contextBuilderTestContext.context_builder.Build(); err == nil {
 		return fmt.Errorf("Expected an error to have been thrown")
 	}
 	return nil

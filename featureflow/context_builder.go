@@ -4,16 +4,16 @@ import "errors"
 
 type Value interface{}
 
-type contextInterface interface {
+type Context interface {
 	GetKey() string
 	GetValuesForKey(string) []Value
 	GetValueKeys() []string
 }
 
-type contextBuilderInterface interface {
-	WithValue(string, Value) contextBuilderInterface
-	WithValues(string, []Value) contextBuilderInterface
-	Build() contextInterface
+type ContextBuilder interface {
+	WithValue(string, Value) ContextBuilder
+	WithValues(string, []Value) ContextBuilder
+	Build() (Context, error)
 }
 
 type contextBuilder struct {
@@ -26,28 +26,28 @@ type context struct{
 	values map[string][]Value
 }
 
-func (cb *contextBuilder) WithValue(key string, value Value) contextBuilderInterface {
+func (cb *contextBuilder) WithValue(key string, value Value) ContextBuilder {
 	cb.values[key] = []Value{value}
 	return cb
 }
 
-func (cb *contextBuilder) WithValues(Key string, Values []Value) contextBuilderInterface {
+func (cb *contextBuilder) WithValues(Key string, Values []Value) ContextBuilder {
 	cb.values[Key] = Values
 	return cb
 }
 
-func (cb *contextBuilder) Build() contextInterface {
+func (cb *contextBuilder) Build() (Context, error) {
+	if len(cb.key) == 0 {
+		return &context{}, errors.New("Key is required")
+	}
 	return &context{
 		key: cb.key,
 		values: cb.values,
-	}
+	}, nil
 }
 
-func NewContextBuilder(Key string) (contextBuilderInterface, error) {
-	if len(Key) == 0 {
-		return nil, errors.New("A key must be defined")
-	}
-	return &contextBuilder{key:Key, values: make(map[string][]Value)}, nil
+func NewContextBuilder(Key string) ContextBuilder {
+	return &contextBuilder{key:Key, values: make(map[string][]Value)}
 }
 
 func (c *context) GetKey() string {

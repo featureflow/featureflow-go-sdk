@@ -11,8 +11,8 @@ import (
 
 type rulesTestContextType struct{
 	result                bool
-	rule                  rule
-	context_builder       contextBuilderInterface
+	rule                  Rule
+	context_builder       ContextBuilder
 	variantValue          float64
 	splitKeyVariantResult string
 }
@@ -25,12 +25,13 @@ func theRuleIsADefaultRule() error {
 }
 
 func theRuleIsMatchedAgainstTheContext() error {
+	c, err := rulesTestContext.context_builder.Build()
 	rulesTestContext.result = ruleMatches(
 		rulesTestContext.rule,
-		rulesTestContext.context_builder.Build(),
+		c,
 	)
 
-	return nil
+	return err
 }
 
 func theResultFromTheMatchShouldBe(resultStr string) error {
@@ -80,7 +81,7 @@ func theRulesAudienceConditionsAre(audienceConditions *gherkin.DataTable) error 
 	conditions := &rulesTestContext.rule.Audience.Conditions
 
 	for i := 1; i < len(audienceConditions.Rows); i++ {
-		condition := condition{}
+		condition := Condition{}
 		for n, cell := range audienceConditions.Rows[i].Cells {
 			switch head[n].Value {
 			case "operator":
@@ -110,7 +111,7 @@ func theVariantSplitsAre(variantSplits *gherkin.DataTable) error {
 	splits := &rulesTestContext.rule.VariantSplits
 
 	for i := 1; i < len(variantSplits.Rows); i++ {
-		variantSplit := variantSplit{}
+		variantSplit := VariantSplit{}
 		for n, cell := range variantSplits.Rows[i].Cells {
 			switch head[n].Value {
 			case "variantKey":
@@ -155,16 +156,15 @@ func RulesFeatureContext(s *godog.Suite) {
 
 
 	s.BeforeScenario(func(interface{}) {
-		context_builder, _ := NewContextBuilder("anonymous")
 		rulesTestContext = rulesTestContextType{
-			rule: rule{
+			rule: Rule{
 				DefaultRule: false,
-				VariantSplits:[]variantSplit{},
-				Audience: audience{
-					Conditions: []condition{},
+				VariantSplits:[]VariantSplit{},
+				Audience: Audience{
+					Conditions: []Condition{},
 				},
 			},
-			context_builder: context_builder,
+			context_builder: NewContextBuilder("anonymous"),
 		}
 	})
 }

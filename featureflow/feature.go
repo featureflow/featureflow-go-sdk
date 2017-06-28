@@ -1,28 +1,28 @@
 package featureflow
 
-type feature struct {
+type Feature struct {
 	Key string `json:"key"`
-	Rules []rule `json:"rules"`
+	Rules []Rule `json:"rules"`
 	OffVariantKey string `json:"offVariantKey"`
 }
 
-type rule struct {
+type Rule struct {
 	DefaultRule   bool `json:"defaultRule,omitempty"`
-	Audience      audience `json:"audience,omitempty"`
-	VariantSplits []variantSplit `json:"variantSplits"`
+	Audience      Audience `json:"audience,omitempty"`
+	VariantSplits []VariantSplit `json:"variantSplits"`
 }
 
-type audience struct {
-	Conditions []condition `json:"conditions,omitempty"`
+type Audience struct {
+	Conditions []Condition `json:"conditions,omitempty"`
 }
 
-type condition struct {
+type Condition struct {
 	Target string `json:"target"`
 	Operator string `json:"operator"`
 	Values []interface{} `json:"values"`
 }
 
-type variantSplit struct {
+type VariantSplit struct {
 	VariantKey string `json:"variantKey"`
 	Split float64 `json:"split"`
 }
