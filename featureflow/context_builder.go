@@ -1,6 +1,9 @@
 package featureflow
 
-import "errors"
+import (
+	"errors"
+	"time"
+)
 
 type Value interface{}
 
@@ -47,7 +50,13 @@ func (cb *contextBuilder) Build() (Context, error) {
 }
 
 func NewContextBuilder(Key string) ContextBuilder {
-	return &contextBuilder{key:Key, values: make(map[string][]Value)}
+	values := make(map[string][]Value)
+	values["featureflow.key"] = []Value{Key}
+	values["featureflow.date"] = []Value{time.Now().Format(time.RFC3339)}
+	return &contextBuilder{
+		key:Key,
+		values: values,
+	}
 }
 
 func (c *context) GetKey() string {

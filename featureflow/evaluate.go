@@ -21,6 +21,6 @@ func (e Evaluate) IsOff() bool{
 	return e.Is("off")
 }
 
-func (e Evaluate) value() string{
+func (e Evaluate) Value() string{
 	return e.evaluated_variant
 }
