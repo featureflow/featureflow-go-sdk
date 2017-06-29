@@ -10,21 +10,20 @@ import (
 )
 
 func (e*EventsClient) registerFeaturesEvent(features []FeatureRegistration){
-	if e.Disabled{
+	if e.Config.DisableEvents{
 		return
 	}
 	body, _ := json.Marshal(features)
-	go sendEvent(
+	go e.sendEvent(
 		"Register Features",
 		http.MethodPut,
 		"https://app.featureflow.io/api/sdk/v1/register",
-		e.ApiKey,
 		body,
 	)
 }
 
 func (e*EventsClient) evaluateEvent(key, evaluatedVariant, expectedVariant string, context Context){
-	if e.Disabled{
+	if e.Config.DisableEvents{
 		return
 	}
 	body, _ := json.Marshal(
@@ -35,11 +34,11 @@ func (e*EventsClient) evaluateEvent(key, evaluatedVariant, expectedVariant strin
 			Context Context `json:"context"`
 		}{key, evaluatedVariant, expectedVariant, context},
 	)
-	go sendEvent("evaluate", http.MethodPost, "https://app.featureflow.io/api/sdk/v1/events", e.ApiKey, body)
+	go e.sendEvent("evaluate", http.MethodPost, "https://app.featureflow.io/api/sdk/v1/events", body)
 }
 
 
-func sendEvent(event_name, method, url, api_key string, body []byte){
+func (e*EventsClient) sendEvent(event_name, method, url string, body []byte){
 	client := http.Client{
 		Timeout: time.Second * 5,
 	}
@@ -49,17 +48,24 @@ func sendEvent(event_name, method, url, api_key string, body []byte){
 		log.Fatal(err)
 	}
 
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", api_key))
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", e.ApiKey))
 	res, _ := client.Do(req)
+
+	if res.StatusCode >= 400{
+		e.Config.Logger.Println(
+			LOG_ERROR,
+			fmt.Sprintf("unable to send event %s to %s. Failed with response status %d", event_name, url, res.StatusCode),
+		)
+	}
 	res.Body.Close()
 }
 
 type EventsClient struct{
 	ApiKey string
-	Disabled bool
+	Config *Config
 }
 
-func NewEventsClient(api_key string, disabled bool) EventsClient {
-	return EventsClient{api_key, disabled}
+func NewEventsClient(api_key string, config *Config) EventsClient {
+	return EventsClient{api_key, config}
 }
 

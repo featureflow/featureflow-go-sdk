@@ -1,6 +1,13 @@
 package featureflow
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+	"os"
+)
+
+const LOG_INFO = "[info]"
+const LOG_ERROR = "[error]"
 
 type FeatureflowClient struct{
 	ApiKey string
@@ -14,11 +21,16 @@ type Config struct {
 	FeatureStore FeatureStore
 	FeatureRegistrations []FeatureRegistration
 	DisableEvents bool
+	Logger *log.Logger
 }
 
 
 func Client(api_key string, config Config) (*FeatureflowClient, error){
+	if (config.Logger == nil){
+		config.Logger = log.New(os.Stderr, "Featureflow:", log.LstdFlags)
+	}
 	//TODO LOG> Featureflow initializing
+	config.Logger.Println(LOG_INFO, "initializing client")
 
 	if len(api_key) == 0{
 		return nil, fmt.Errorf("Api_Key must exist")
@@ -29,21 +41,21 @@ func Client(api_key string, config Config) (*FeatureflowClient, error){
 		config.FeatureStore = featureStore
 	}
 
-	eventsClient := NewEventsClient(api_key, config.DisableEvents)
+	eventsClient := NewEventsClient(api_key, &config)
 
 	url := "https://app.featureflow.io/api/sdk/v1/features"
-	go newPollingClient(api_key, url, config.FeatureStore)
+	go newPollingClient(api_key, url, &config)
 
 	failoverVariants := make(map[string]string)
 
 	if config.FeatureRegistrations != nil{
-		//TODO LOG> Featureflow registering features with featureflow
 		eventsClient.registerFeaturesEvent(config.FeatureRegistrations)
 		for _, registration := range config.FeatureRegistrations{
+			config.Logger.Println(LOG_INFO, "Registering feature with key " + registration.Key)
 			failoverVariants[registration.Key] = registration.FailoverVariant
 		}
 	}
-	//TODO LOG> Featureflow initialized
+	config.Logger.Println(LOG_INFO, "client initialized")
 	return &FeatureflowClient{
 		api_key,
 		config,
@@ -60,12 +72,20 @@ func (client *FeatureflowClient) Evaluate(key string, context Context) Evaluate 
 
 	if error != nil{
 		failover := client.FailoverVariants[key]
+		providedOrDefaultString := "default"
 		if len(failover) > 0 {
-			//TODO WARN> Using failover variant of {failover}
 			evaluatedVariant = failover
-		} else{
-			//TODO WARN> Using default failover variant of "off"
+			providedOrDefaultString = "provided"
 		}
+		client.Config.Logger.Println(
+			LOG_INFO,
+			fmt.Sprintf(
+				"Evaluating nil feature '%s' using the %s failover '%s'",
+				key,
+				providedOrDefaultString,
+				evaluatedVariant,
+			),
+		)
 	} else{
 		for _, rule := range feature.Rules {
 			if ruleMatches(rule, context){

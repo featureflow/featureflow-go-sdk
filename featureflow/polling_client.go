@@ -9,9 +9,9 @@ import (
 	"encoding/json"
 )
 
-func newPollingClient(api_key string, url string, featureStore FeatureStore){
+func newPollingClient(api_key string, url string, config *Config){
 	var etag string = ""
-	go getFeatures(api_key, url, &etag, featureStore)
+	go getFeatures(api_key, url, &etag, config)
 
 	ticker := time.NewTicker(30 * time.Second)
 	quit := make(chan struct{})
@@ -20,7 +20,7 @@ func newPollingClient(api_key string, url string, featureStore FeatureStore){
 		for {
 			select {
 			case <- ticker.C:
-				getFeatures(api_key, url, &etag, featureStore)
+				getFeatures(api_key, url, &etag, config)
 			case <- quit:
 				ticker.Stop()
 				return
@@ -29,7 +29,7 @@ func newPollingClient(api_key string, url string, featureStore FeatureStore){
 	}()
 }
 
-func getFeatures(api_key string, url string, etag *string, featureStore FeatureStore){
+func getFeatures(api_key string, url string, etag *string, config *Config){
 	featureClient := http.Client{
 		Timeout: time.Second * 5,
 	}
@@ -47,6 +47,7 @@ func getFeatures(api_key string, url string, etag *string, featureStore FeatureS
 		log.Println(getErr)
 	}
 
+	defer res.Body.Close()
 	if res.StatusCode == 200 {
 		*etag = res.Header.Get("ETag")
 
@@ -54,7 +55,6 @@ func getFeatures(api_key string, url string, etag *string, featureStore FeatureS
 		if readErr != nil {
 			log.Println(readErr)
 		}
-		res.Body.Close()
 
 		var features map[string]Feature
 
@@ -67,7 +67,10 @@ func getFeatures(api_key string, url string, etag *string, featureStore FeatureS
 			featuresMap[key] = &f
 		}
 
-		featureStore.SetAll(featuresMap)
+		config.Logger.Println(LOG_INFO, "updating features")
+		config.FeatureStore.SetAll(featuresMap)
+	} else if res.StatusCode >= 400{
+		config.Logger.Println(LOG_ERROR, fmt.Sprintf("request for features failed with response status %d", res.StatusCode))
 	}
 }
 
