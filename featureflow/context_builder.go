@@ -22,8 +22,8 @@ type contextBuilder struct {
 }
 
 type context struct{
-	key string
-	values map[string][]Value
+	key string `json:"key"`
+	values map[string][]Value `json:"values"`
 }
 
 func (cb *contextBuilder) WithValue(key string, value Value) ContextBuilder {

@@ -1,36 +1,51 @@
 package featureflow
 
-import "fmt"
+import (
+	"fmt"
+	"sync"
+)
 
 type FeatureStore interface {
 	Get(string) (*Feature, error)
-	Add(string, *Feature) error
-	Clear() error
+	Set(string, *Feature) error
+	SetAll(map[string]*Feature) error
 }
 
 type inMemoryStore struct{
 	features map[string]*Feature
+	sync.RWMutex
 }
 
 func (store *inMemoryStore) Get(key string) (*Feature, error){
-	if feature, ok := store.features[key]; ok {
+	store.RLock()
+	defer store.RUnlock()
+
+	feature := store.features[key]
+
+	if feature != nil {
 		return feature, nil
 	} else {
-		return feature, fmt.Errorf("feature %s was not found", key)
+		return nil, fmt.Errorf("feature %s was not found", key)
 	}
 }
 
-func (store *inMemoryStore) Add(key string, feature *Feature) error{
+func (store *inMemoryStore) Set(key string, feature *Feature) error{
+	store.Lock()
+	defer store.Unlock()
+
 	store.features[key] = feature
 	return nil
 }
 
-func (store *inMemoryStore) Clear() error{
-	store.features = make(map[string]*Feature)
+func (store *inMemoryStore) SetAll(features map[string]*Feature) error{
+	store.Lock()
+	defer store.Unlock()
+
+	store.features = features
 	return nil
 }
 
-func NewInMemoryStore() (FeatureStore, error){
+func NewInMemoryStore() (*inMemoryStore, error){
 	return &inMemoryStore{
 		features: make(map[string]*Feature),
 	}, nil
