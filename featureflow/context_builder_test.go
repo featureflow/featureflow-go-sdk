@@ -4,6 +4,7 @@ import (
 	"github.com/DATA-DOG/godog"
 	"github.com/DATA-DOG/godog/gherkin"
 	"fmt"
+	"strings"
 )
 
 type contextBuilderTestContextType struct {
@@ -36,7 +37,15 @@ func theResultContextShouldHaveAKey(key string) error {
 }
 
 func theResultContextShouldHaveNoValues() error {
-	if len(contextBuilderTestContext.context.GetValueKeys()) > 0{
+	keys := contextBuilderTestContext.context.GetValueKeys()
+	filteredKeys := keys[:0]
+	for _, key := range keys {
+		if !strings.HasPrefix(key, "featureflow.") {
+			filteredKeys = append(filteredKeys, key)
+		}
+	}
+
+	if len(filteredKeys) > 0{
 		return fmt.Errorf("Expected %d to be greater than 0", len(contextBuilderTestContext.context.GetValueKeys()))
 	}
 	return nil
