@@ -4,7 +4,6 @@ Feature: Rules
     When the rule is matched against the context
     Then the result from the match should be true
 
-  @ignore
   Scenario Outline: Test that the rule context matching works (Context {<contextKey>: <contextValue>} with operator: <operator>, target: <target>, values: <values>, result: <result>)
     Given the context values are
       | key             | value          |
@@ -21,56 +20,6 @@ Feature: Rules
     | role            | ["beta", "alpha"] | equals   | role     | ["beta"]          | true   |
     | role            | ["beta", "alpha"] | equals   | role     | ["alpha"]         | true   |
     | role            | ["beta", "alpha"] | equals   | role     | ["nope"]          | false  |
-
-  Scenario: Test that the rule context matching works (Context {role: "beta"} with operator: equals, target: role, values: ["beta"], result: true)
-      Given the context values are
-        | key             | value          |
-        | role            | "beta"         |
-      And the rule's audience conditions are
-        | operator        | target            | values          |
-        | equals          | role              | ["beta"]        |
-      When the rule is matched against the context
-      Then the result from the match should be true
-
-  Scenario: Test that the rule context matching works (Context {role: "alpha"} with operator: equals, target: role, values: ["beta"], result: false)
-      Given the context values are
-        | key             | value          |
-        | role            | "alpha"        |
-      And the rule's audience conditions are
-        | operator        | target            | values          |
-        | equals          | role              | ["beta"]        |
-      When the rule is matched against the context
-      Then the result from the match should be false
-
-  Scenario: Test that the rule context matching works (Context {role: ["alpha","beta"]} with operator: equals, target: role, values: ["beta"], result: true)
-    Given the context values are
-      | key             | value            |
-      | role            | ["alpha","beta"] |
-    And the rule's audience conditions are
-      | operator        | target            | values          |
-      | equals          | role              | ["beta"]        |
-    When the rule is matched against the context
-    Then the result from the match should be true
-
-  Scenario: Test that the rule context matching works (Context {role: ["alpha","beta"]} with operator: equals, target: role, values: ["alpha"], result: true)
-      Given the context values are
-        | key             | value            |
-        | role            | ["alpha","beta"] |
-      And the rule's audience conditions are
-        | operator        | target            | values          |
-        | equals          | role              | ["alpha"]       |
-      When the rule is matched against the context
-      Then the result from the match should be true
-
-  Scenario: Test that the rule context matching works (Context {role: ["alpha","beta"]} with operator: equals, target: role, values: ["nope"], result: false)
-      Given the context values are
-        | key             | value            |
-        | role            | ["alpha","beta"] |
-      And the rule's audience conditions are
-        | operator        | target            | values          |
-        | equals          | role              | ["nope"]        |
-      When the rule is matched against the context
-      Then the result from the match should be false
 
   Scenario: Test multiple conditions all passing will return true
     Given the context values are
@@ -97,7 +46,6 @@ Feature: Rules
     When the rule is matched against the context
     Then the result from the match should be false
 
-  @ignore
   Scenario Outline: Get the variant split key works for a default case (value: <value>, on: <on>, off: <off>, result: <result>)
     Given the variant value of <value>
     And the variant splits are
@@ -112,45 +60,6 @@ Feature: Rules
       | 50    | 0   | 100 | on     |
       | 11    | 10  | 90  | on     |
       | 9     | 10  | 90  | off    |
-
-
-  Scenario:
-    Given the variant value of 50
-    And the variant splits are
-      | variantKey | split  |
-      | off        | 100    |
-      | on         | 0      |
-    When the variant split key is calculated
-    Then the resulting variant should be "off"
-
-  Scenario:
-    Given the variant value of 50
-    And the variant splits are
-      | variantKey | split  |
-      | off        | 0      |
-      | on         | 100    |
-    When the variant split key is calculated
-    Then the resulting variant should be "on"
-
-
-  Scenario:
-    Given the variant value of 11
-    And the variant splits are
-      | variantKey | split  |
-      | off        | 10    |
-      | on         | 90      |
-    When the variant split key is calculated
-    Then the resulting variant should be "on"
-
-
-  Scenario:
-    Given the variant value of 9
-    And the variant splits are
-      | variantKey | split  |
-      | off        | 10    |
-      | on         | 90      |
-    When the variant split key is calculated
-    Then the resulting variant should be "off"
 
   Scenario Outline: Testing multiple splits to make sure the right values work (value: <value>, result: <result>)
     Given the variant value of <value>
