@@ -22,17 +22,21 @@ func (e*EventsClient) registerFeaturesEvent(features []FeatureRegistration){
 	)
 }
 
+type evaluateEventType struct{
+	FeatureKey string `json:"featureKey"`
+	EvaluatedVariant string `json:"evaluatedVariant"`
+	ExpectedVariant string `json:"expectedVariant"`
+	Context Context `json:"context"`
+}
+
 func (e*EventsClient) evaluateEvent(key, evaluatedVariant, expectedVariant string, context Context){
 	if e.Config.DisableEvents{
 		return
 	}
 	body, _ := json.Marshal(
-		struct{
-			FeatureKey string `json:"featureKey"`
-			EvaluatedVariant string `json:"evaluatedVariant"`
-			ExpectedVaraint string `json:"expectedVariant"`
-			Context Context `json:"context"`
-		}{key, evaluatedVariant, expectedVariant, context},
+		[]evaluateEventType{
+			{key, evaluatedVariant, expectedVariant, context},
+		},
 	)
 	go e.sendEvent("evaluate", http.MethodPost, "https://app.featureflow.io/api/sdk/v1/events", body)
 }
