@@ -20,12 +20,12 @@ type featureRegistrationBuilder struct{
 	featureRegistration FeatureRegistration
 }
 
-func (f *featureRegistrationBuilder) AddVariant(key, value string) FeatureRegistrationBuilder{
+func (f *featureRegistrationBuilder) AddVariant(key, value string) FeatureRegistrationBuilder {
 	f.featureRegistration.Variants = append(f.featureRegistration.Variants, FeatureRegistrationVariant{key, value})
 	return f
 }
 
-func (f* featureRegistrationBuilder) Build() FeatureRegistration{
+func (f* featureRegistrationBuilder) Build() FeatureRegistration {
 	if len(f.featureRegistration.Variants) < 2{
 		f.featureRegistration.Variants = []FeatureRegistrationVariant{
 			{"on","On"},

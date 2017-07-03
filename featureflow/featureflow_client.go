@@ -19,7 +19,7 @@ type FeatureflowClient struct{
 type Config struct {
 	Url string
 	FeatureStore FeatureStore
-	FeatureRegistrations []FeatureRegistration
+	WithFeatures []FeatureRegistration
 	DisableEvents bool
 	Logger *log.Logger
 }
@@ -48,9 +48,9 @@ func Client(api_key string, config Config) (*FeatureflowClient, error){
 
 	failoverVariants := make(map[string]string)
 
-	if config.FeatureRegistrations != nil{
-		eventsClient.registerFeaturesEvent(config.FeatureRegistrations)
-		for _, registration := range config.FeatureRegistrations{
+	if config.WithFeatures != nil{
+		eventsClient.registerFeaturesEvent(config.WithFeatures)
+		for _, registration := range config.WithFeatures{
 			config.Logger.Println(LOG_INFO, "Registering feature with key " + registration.Key)
 			failoverVariants[registration.Key] = registration.FailoverVariant
 		}
@@ -64,6 +64,11 @@ func Client(api_key string, config Config) (*FeatureflowClient, error){
 	}, nil
 }
 
+
+func (client *FeatureflowClient) EvaluateBasic(key, contextKey string) Evaluate{
+	context, _ := NewContextBuilder(contextKey).Build()
+	return client.Evaluate(key, context)
+}
 
 func (client *FeatureflowClient) Evaluate(key string, context Context) Evaluate {
 	feature, error := client.Config.FeatureStore.Get(key)

@@ -6,17 +6,17 @@ import (
 )
 
 type FeatureStore interface {
-	Get(string) (*Feature, error)
-	Set(string, *Feature) error
-	SetAll(map[string]*Feature) error
+	Get(string) (*feature, error)
+	Set(string, *feature) error
+	SetAll(map[string]*feature) error
 }
 
 type inMemoryStore struct{
-	features map[string]*Feature
+	features map[string]*feature
 	sync.RWMutex
 }
 
-func (store *inMemoryStore) Get(key string) (*Feature, error){
+func (store *inMemoryStore) Get(key string) (*feature, error){
 	store.RLock()
 	defer store.RUnlock()
 
@@ -29,7 +29,7 @@ func (store *inMemoryStore) Get(key string) (*Feature, error){
 	}
 }
 
-func (store *inMemoryStore) Set(key string, feature *Feature) error{
+func (store *inMemoryStore) Set(key string, feature *feature) error{
 	store.Lock()
 	defer store.Unlock()
 
@@ -37,7 +37,7 @@ func (store *inMemoryStore) Set(key string, feature *Feature) error{
 	return nil
 }
 
-func (store *inMemoryStore) SetAll(features map[string]*Feature) error{
+func (store *inMemoryStore) SetAll(features map[string]*feature) error{
 	store.Lock()
 	defer store.Unlock()
 
@@ -47,6 +47,6 @@ func (store *inMemoryStore) SetAll(features map[string]*Feature) error{
 
 func NewInMemoryStore() (*inMemoryStore, error){
 	return &inMemoryStore{
-		features: make(map[string]*Feature),
+		features: make(map[string]*feature),
 	}, nil
 }

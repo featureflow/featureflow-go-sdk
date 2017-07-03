@@ -56,11 +56,11 @@ func getFeatures(api_key string, url string, etag *string, config *Config){
 			log.Println(readErr)
 		}
 
-		var features map[string]Feature
+		var features map[string]feature
 
 		json.Unmarshal(body, &features)
 
-		featuresMap := make(map[string]*Feature)
+		featuresMap := make(map[string]*feature)
 
 		for key, _ := range features{
 			var f = features[key]

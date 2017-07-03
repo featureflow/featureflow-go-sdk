@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-func ruleMatches(rule Rule, context Context) bool{
+func ruleMatches(rule rule, context Context) bool{
 	if rule.DefaultRule == true{
 		return true
 	} else {
@@ -26,7 +26,7 @@ func ruleMatches(rule Rule, context Context) bool{
 	}
 }
 
-func getVariantSplitKey(variant_splits []VariantSplit, variant_value float64) string{
+func getVariantSplitKey(variant_splits []variantSplit, variant_value float64) string{
 	percent := 0.0
 
 	for _, variant_split := range variant_splits {
