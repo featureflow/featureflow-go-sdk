@@ -17,7 +17,7 @@ func (e*EventsClient) registerFeaturesEvent(features []FeatureRegistration){
 	go e.sendEvent(
 		"Register Features",
 		http.MethodPut,
-		"https://app.featureflow.io/api/sdk/v1/register",
+		e.Config.BaseURL+"/api/sdk/v1/register",
 		body,
 	)
 }
@@ -38,7 +38,7 @@ func (e*EventsClient) evaluateEvent(key, evaluatedVariant, expectedVariant strin
 			{key, evaluatedVariant, expectedVariant, context},
 		},
 	)
-	go e.sendEvent("evaluate", http.MethodPost, "https://app.featureflow.io/api/sdk/v1/events", body)
+	go e.sendEvent("evaluate", http.MethodPost, e.Config.BaseURL+"/api/sdk/v1/events", body)
 }
 
 
@@ -55,13 +55,18 @@ func (e*EventsClient) sendEvent(event_name, method, url string, body []byte){
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", e.ApiKey))
 	res, _ := client.Do(req)
 
-	if res.StatusCode >= 400{
-		e.Config.Logger.Println(
-			LOG_ERROR,
-			fmt.Sprintf("unable to send event %s to %s. Failed with response status %d", event_name, url, res.StatusCode),
-		)
+	if res != nil {
+		if res.StatusCode >= 400{
+			e.Config.Logger.Println(
+				LOG_ERROR,
+				fmt.Sprintf("unable to send event %s to %s. Failed with response status %d", event_name, url, res.StatusCode),
+			)
+		}
+		res.Body.Close()
+	} else{
+		e.Config.Logger.Println(LOG_ERROR, "unable to send event %s to %s. Internal SDK error", event_name, url)
 	}
-	res.Body.Close()
+
 }
 
 type EventsClient struct{

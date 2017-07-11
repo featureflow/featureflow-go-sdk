@@ -17,7 +17,7 @@ type FeatureflowClient struct{
 }
 
 type Config struct {
-	Url string
+	BaseURL string
 	FeatureStore FeatureStore
 	WithFeatures []FeatureRegistration
 	DisableEvents bool
@@ -26,10 +26,9 @@ type Config struct {
 
 
 func Client(api_key string, config Config) (*FeatureflowClient, error){
-	if (config.Logger == nil){
+	if config.Logger == nil{
 		config.Logger = log.New(os.Stderr, "Featureflow:", log.LstdFlags)
 	}
-	//TODO LOG> Featureflow initializing
 	config.Logger.Println(LOG_INFO, "initializing client")
 
 	if len(api_key) == 0{
@@ -41,10 +40,15 @@ func Client(api_key string, config Config) (*FeatureflowClient, error){
 		config.FeatureStore = featureStore
 	}
 
+	if config.BaseURL == ""{
+		config.BaseURL = "https://app.featureflow.io"
+	}
+
+	config.Logger.Println(LOG_INFO, fmt.Sprintf("Connecting to %s", config.BaseURL))
+
 	eventsClient := NewEventsClient(api_key, &config)
 
-	url := "https://app.featureflow.io/api/sdk/v1/features"
-	go newPollingClient(api_key, url, &config)
+	newPollingClient(api_key, config.BaseURL+"/api/sdk/v1/features", &config)
 
 	failoverVariants := make(map[string]string)
 

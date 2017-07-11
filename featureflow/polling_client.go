@@ -11,7 +11,7 @@ import (
 
 func newPollingClient(api_key string, url string, config *Config){
 	var etag string = ""
-	go getFeatures(api_key, url, &etag, config)
+	getFeatures(api_key, url, &etag, config)
 
 	ticker := time.NewTicker(30 * time.Second)
 	quit := make(chan struct{})
