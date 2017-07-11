@@ -96,13 +96,18 @@ func (client *FeatureflowClient) Evaluate(key string, context Context) Evaluate 
 			),
 		)
 	} else{
-		for _, rule := range feature.Rules {
-			if ruleMatches(rule, context){
-				variant_value := getVariantValue(calculateHash("1", key, context.GetKey()))
-				evaluatedVariant = getVariantSplitKey(rule.VariantSplits, variant_value)
-				break
+		if feature.Enabled {
+			for _, rule := range feature.Rules {
+				if ruleMatches(rule, context){
+					variant_value := getVariantValue(calculateHash("1", key, context.GetKey()))
+					evaluatedVariant = getVariantSplitKey(rule.VariantSplits, variant_value)
+					break
+				}
 			}
+		} else {
+			evaluatedVariant = feature.OffVariantKey
 		}
+
 	}
 
 	return Evaluate{

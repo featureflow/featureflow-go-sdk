@@ -4,6 +4,7 @@ type feature struct {
 	Key string `json:"key"`
 	Rules []rule `json:"rules"`
 	OffVariantKey string `json:"offVariantKey"`
+	Enabled bool `json:"enabled"`
 }
 
 type rule struct {
