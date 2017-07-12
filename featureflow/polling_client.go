@@ -2,7 +2,6 @@ package featureflow
 
 import (
 	"time"
-	"log"
 	"fmt"
 	"net/http"
 	"io/ioutil"
@@ -36,7 +35,7 @@ func getFeatures(api_key string, url string, etag *string, config *Config){
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		log.Println(err)
+		config.Logger.Println(LOG_ERROR, err)
 	}
 
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", api_key))
@@ -44,7 +43,8 @@ func getFeatures(api_key string, url string, etag *string, config *Config){
 
 	res, getErr := featureClient.Do(req)
 	if getErr != nil {
-		log.Println(getErr)
+		config.Logger.Println(LOG_ERROR, getErr)
+		return
 	}
 
 	defer res.Body.Close()
@@ -53,7 +53,7 @@ func getFeatures(api_key string, url string, etag *string, config *Config){
 
 		body, readErr := ioutil.ReadAll(res.Body)
 		if readErr != nil {
-			log.Println(readErr)
+			config.Logger.Println(LOG_ERROR, readErr)
 		}
 
 		var features map[string]feature
