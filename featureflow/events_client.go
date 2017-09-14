@@ -26,16 +26,16 @@ type evaluateEventType struct{
 	FeatureKey string `json:"featureKey"`
 	EvaluatedVariant string `json:"evaluatedVariant"`
 	ExpectedVariant string `json:"expectedVariant"`
-	Context Context `json:"context"`
+	User User `json:"user"`
 }
 
-func (e*EventsClient) evaluateEvent(key, evaluatedVariant, expectedVariant string, context Context){
+func (e*EventsClient) evaluateEvent(key, evaluatedVariant, expectedVariant string, user User){
 	if e.Config.DisableEvents{
 		return
 	}
 	body, _ := json.Marshal(
 		[]evaluateEventType{
-			{key, evaluatedVariant, expectedVariant, context},
+			{key, evaluatedVariant, expectedVariant, user},
 		},
 	)
 	go e.sendEvent("evaluate", http.MethodPost, e.Config.BaseURL+"/api/sdk/v1/events", body)
@@ -53,6 +53,7 @@ func (e*EventsClient) sendEvent(event_name, method, url string, body []byte){
 	}
 
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", e.ApiKey))
+	req.Header.Set("X-Featureflow-Client", fmt.Sprintf("GoClient/1.0.0"))
 	res, _ := client.Do(req)
 
 	if res != nil {

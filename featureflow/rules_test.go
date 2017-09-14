@@ -12,7 +12,7 @@ import (
 type rulesTestContextType struct{
 	result                bool
 	rule                  rule
-	context_builder       ContextBuilder
+	user_builder       UserBuilder
 	variantValue          float64
 	splitKeyVariantResult string
 }
@@ -24,8 +24,8 @@ func theRuleIsADefaultRule() error {
 	return nil
 }
 
-func theRuleIsMatchedAgainstTheContext() error {
-	c, err := rulesTestContext.context_builder.Build()
+func theRuleIsMatchedAgainstTheUser() error {
+	c, err := rulesTestContext.user_builder.Build()
 	rulesTestContext.result = ruleMatches(
 		rulesTestContext.rule,
 		c,
@@ -45,32 +45,32 @@ func theResultFromTheMatchShouldBe(resultStr string) error {
 	return nil
 }
 
-func theContextValuesAre(contextValuesTable *gherkin.DataTable) error {
+func theUserAttributesAre(userAttributesTable *gherkin.DataTable) error {
 
-	head := contextValuesTable.Rows[0].Cells
+	head := userAttributesTable.Rows[0].Cells
 
-	for i := 1; i < len(contextValuesTable.Rows); i++ {
+	for i := 1; i < len(userAttributesTable.Rows); i++ {
 		key := ""
-		var value Value
-		var values []Value
-		for n, cell := range contextValuesTable.Rows[i].Cells {
+		var attribute Attribute
+		var attributes []Attribute
+		for n, cell := range userAttributesTable.Rows[i].Cells {
 			switch head[n].Value {
 			case "key":
 				key = cell.Value
 			case "value":
 				if cell.Value[0] == '[' {
-					json.Unmarshal([]byte(cell.Value), &values)
+					json.Unmarshal([]byte(cell.Value), &attributes)
 				} else{
-					json.Unmarshal([]byte(cell.Value), &value)
+					json.Unmarshal([]byte(cell.Value), &attribute)
 				}
 			default:
 				return fmt.Errorf("unexpected column name: %s", head[n].Value)
 			}
 		}
-		if values != nil {
-			rulesTestContext.context_builder = rulesTestContext.context_builder.WithValues(key, values)
+		if attributes != nil {
+			rulesTestContext.user_builder = rulesTestContext.user_builder.WithAttributes(key, attributes)
 		} else {
-			rulesTestContext.context_builder = rulesTestContext.context_builder.WithValue(key, value)
+			rulesTestContext.user_builder = rulesTestContext.user_builder.WithAttribute(key, attribute)
 		}
 	}
 	return nil
@@ -145,9 +145,9 @@ func theResultingVariantShouldBe(variant string) error {
 
 func RulesFeatureContext(s *godog.Suite) {
 	s.Step(`^the rule is a default rule$`, theRuleIsADefaultRule)
-	s.Step(`^the rule is matched against the context$`, theRuleIsMatchedAgainstTheContext)
+	s.Step(`^the rule is matched against the user$`, theRuleIsMatchedAgainstTheUser)
 	s.Step(`^the result from the match should be (true|false)$`, theResultFromTheMatchShouldBe)
-	s.Step(`^the context values are$`, theContextValuesAre)
+	s.Step(`^the user attributes are$`, theUserAttributesAre)
 	s.Step(`^the rule\'s audience conditions are$`, theRulesAudienceConditionsAre)
 	s.Step(`^the variant value of (\d+)$`, theVariantValueOf)
 	s.Step(`^the variant splits are$`, theVariantSplitsAre)
@@ -164,7 +164,7 @@ func RulesFeatureContext(s *godog.Suite) {
 					Conditions: []condition{},
 				},
 			},
-			context_builder: NewContextBuilder("anonymous"),
+			user_builder: NewUserBuilder("anonymous"),
 		}
 	})
 }

@@ -18,15 +18,15 @@ package main
 
 import "github.com/featureflow/featureflow-go-sdk/featureflow"
 
-//Get user context somewhere in your code
+//Get user somewhere in your code
 func main(){ 
     client, _ := featureflow.Client("srv-env-<api_key>", featureflow.Config{})
-    context, _ := featureflow.NewContextBuilder("userKey").
-                               WithValues("roles", []string{"admin", "user"}).
-                               WithValue("age", 20).
+    user, _ := featureflow.NewUserBuilder("userId").
+                               WithAttributes("roles", []string{"admin", "user"}).
+                               WithAttribute("age", 20).
                                Build()
                  
-    if client.Evaluate("my-feature", context).Is("on"){ // same as .IsOn(), also use .IsOff() == .Is("off")
+    if client.Evaluate("my-feature", user).Is("on"){ // same as .IsOn(), also use .IsOff() == .Is("off")
         //feature variant is turend on for this user
     }  
 }

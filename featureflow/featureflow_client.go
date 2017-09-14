@@ -69,12 +69,12 @@ func Client(api_key string, config Config) (*FeatureflowClient, error){
 }
 
 
-func (client *FeatureflowClient) EvaluateBasic(key, contextKey string) Evaluate{
-	context, _ := NewContextBuilder(contextKey).Build()
-	return client.Evaluate(key, context)
+func (client *FeatureflowClient) EvaluateBasic(key, userId string) Evaluate{
+	user, _ := NewUserBuilder(userId).Build()
+	return client.Evaluate(key, user)
 }
 
-func (client *FeatureflowClient) Evaluate(key string, context Context) Evaluate {
+func (client *FeatureflowClient) Evaluate(key string, user User) Evaluate {
 	feature, error := client.Config.FeatureStore.Get(key)
 
 	var evaluatedVariant string = "off"
@@ -98,8 +98,8 @@ func (client *FeatureflowClient) Evaluate(key string, context Context) Evaluate 
 	} else{
 		if feature.Enabled {
 			for _, rule := range feature.Rules {
-				if ruleMatches(rule, context){
-					variant_value := getVariantValue(calculateHash("1", key, context.GetKey()))
+				if ruleMatches(rule, user){
+					variant_value := getVariantValue(calculateHash("1", key, user.GetId()))
 					evaluatedVariant = getVariantSplitKey(rule.VariantSplits, variant_value)
 					break
 				}
@@ -113,7 +113,7 @@ func (client *FeatureflowClient) Evaluate(key string, context Context) Evaluate 
 	return Evaluate{
 		feature_key: key,
 		evaluated_variant: evaluatedVariant,
-		context: context,
+		user: user,
 		eventsClient: client.EventsClient,
 	}
 }

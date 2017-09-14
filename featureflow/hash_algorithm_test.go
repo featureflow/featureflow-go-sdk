@@ -8,18 +8,18 @@ import (
 type hashAlgorithmContextType struct {
 	salt string
 	feature string
-	contextKey string
+	userId string
 	hashResult string
 	result float64
 }
 
 var hashAlgorithmContext hashAlgorithmContextType
 
-func theSaltIsTheFeatureIsAndTheKeyIs(salt, feature, contextKey string) error {
+func theSaltIsTheFeatureIsAndTheUserIdIs(salt, feature, userId string) error {
 	hashAlgorithmContext = hashAlgorithmContextType{
 		salt: salt,
 		feature: feature,
-		contextKey: contextKey,
+		userId: userId,
 	}
 	return nil
 }
@@ -28,7 +28,7 @@ func theVariantValueIsCalculated() error {
 	hashAlgorithmContext.hashResult = calculateHash(
 		hashAlgorithmContext.salt,
 		hashAlgorithmContext.feature,
-		hashAlgorithmContext.contextKey,
+		hashAlgorithmContext.userId,
 	)
 
 	hashAlgorithmContext.result = getVariantValue(hashAlgorithmContext.hashResult)
@@ -50,7 +50,7 @@ func theResultFromTheVariantCalculationShouldBe(result float64) error {
 }
 
 func HashAlgorithmFeatureContext(s *godog.Suite) {
-	s.Step(`^the salt is "([^"]*)", the feature is "([^"]*)" and the key is "([^"]*)"$`, theSaltIsTheFeatureIsAndTheKeyIs)
+	s.Step(`^the salt is "([^"]*)", the feature is "([^"]*)" and the user id is "([^"]*)"$`, theSaltIsTheFeatureIsAndTheUserIdIs)
 	s.Step(`^the variant value is calculated$`, theVariantValueIsCalculated)
 	s.Step(`^the hash value calculated should equal "([^"]*)"$`, theHashValueCalculatedShouldEqual)
 	s.Step(`^the result from the variant calculation should be (\d+)$`, theResultFromTheVariantCalculationShouldBe)

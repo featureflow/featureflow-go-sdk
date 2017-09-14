@@ -6,13 +6,13 @@ import (
 	"strconv"
 )
 
-func ruleMatches(rule rule, context Context) bool{
+func ruleMatches(rule rule, user User) bool{
 	if rule.DefaultRule == true{
 		return true
 	} else {
 		for _, condition := range rule.Audience.Conditions{
 			pass := false
-			for _, value := range context.GetValuesForKey(condition.Target){
+			for _, value := range user.GetAttributesForKey(condition.Target){
 				if conditionsTest(condition.Operator, value, condition.Values){
 					pass = true
 					break
@@ -39,8 +39,8 @@ func getVariantSplitKey(variant_splits []variantSplit, variant_value float64) st
 	return "off"
 }
 
-func calculateHash(salt, feature, contextKey string) string{
-	toHash := fmt.Sprintf("%s:%s:%s",salt, feature, contextKey)
+func calculateHash(salt, feature, userId string) string{
+	toHash := fmt.Sprintf("%s:%s:%s",salt, feature, userId)
 	hasher := sha1.New()
 	hasher.Write([]byte(toHash))
 	return fmt.Sprintf("%x", hasher.Sum(nil))[0:15]

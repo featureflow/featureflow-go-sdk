@@ -23,9 +23,9 @@ func theFeatureflowClientIsInitializedWithTheApiKey(api_key string) error {
 	return nil
 }
 
-func theFeatureWithContextKeyIsEvaluatedWithTheValue(featureKey, contextKey, variantValue string) error {
-	context, _ := NewContextBuilder(contextKey).Build()
-	integrationTestContext.result = integrationTestContext.client.Evaluate(featureKey, context).Is(variantValue)
+func theFeatureWithUserIdIsEvaluatedWithTheVariantValue(featureKey, userId, variantValue string) error {
+	user, _ := NewUserBuilder(userId).Build()
+	integrationTestContext.result = integrationTestContext.client.Evaluate(featureKey, user).Is(variantValue)
 	return nil
 }
 
@@ -48,7 +48,7 @@ func theFeatureflowClientShouldThrowAnError() error {
 func IntegrationFeatureContext(s *godog.Suite) {
 	s.Step(`^there is access to the Featureflow library$`, thereIsAccessToTheFeatureflowLibrary)
 	s.Step(`^the FeatureflowClient is initialized with the apiKey "([^"]*)"$`, theFeatureflowClientIsInitializedWithTheApiKey)
-	s.Step(`^the feature "([^"]*)" with context key "([^"]*)" is evaluated with the value "([^"]*)"$`, theFeatureWithContextKeyIsEvaluatedWithTheValue)
+	s.Step(`^the feature "([^"]*)" with user id "([^"]*)" is evaluated with the variant value "([^"]*)"$`, theFeatureWithUserIdIsEvaluatedWithTheVariantValue)
 	s.Step(`^the result of the evaluation should equal (true|false)$`, theResultOfTheEvaluationShouldEqual)
 	s.Step(`^the FeatureflowClient is initialized with no apiKey$`, theFeatureflowClientIsInitializedWithNoApiKey)
 	s.Step(`^the featureflow client should throw an error$`, theFeatureflowClientShouldThrowAnError)
