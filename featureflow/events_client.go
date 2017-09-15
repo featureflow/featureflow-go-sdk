@@ -15,7 +15,6 @@ func (e*EventsClient) registerFeaturesEvent(features []FeatureRegistration){
 	}
 	body, _ := json.Marshal(features)
 	go e.sendEvent(
-		"Register Features",
 		http.MethodPut,
 		e.Config.BaseURL+"/api/sdk/v1/register",
 		body,
