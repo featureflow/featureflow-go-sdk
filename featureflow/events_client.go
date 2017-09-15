@@ -24,6 +24,7 @@ func (e*EventsClient) registerFeaturesEvent(features []FeatureRegistration){
 
 type evaluateEventType struct{
 	FeatureKey string 			`json:"featureKey"`
+	EventType string 			`json:"type"`
 	EvaluatedVariant string 	`json:"evaluatedVariant"`
 	ExpectedVariant string 		`json:"expectedVariant"`
 	Timestamp time.Time 		`json:"timestamp""`
@@ -36,14 +37,14 @@ func (e*EventsClient) evaluateEvent(key, evaluatedVariant, expectedVariant strin
 	}
 	body, _ := json.Marshal(
 		[]evaluateEventType{
-			{key, evaluatedVariant, expectedVariant, time.Now(),user},
+			{key, "evaluate", evaluatedVariant, expectedVariant, time.Now(),user},
 		},
 	)
 	go e.sendEvent("evaluate", http.MethodPost, e.Config.BaseURL+"/api/sdk/v1/events", body)
 }
 
 
-func (e*EventsClient) sendEvent(event_name, method, url string, body []byte){
+func (e*EventsClient) sendEvent(event_type, method, url string, body []byte){
 	client := http.Client{
 		Timeout: time.Second * 5,
 	}
@@ -61,12 +62,12 @@ func (e*EventsClient) sendEvent(event_name, method, url string, body []byte){
 		if res.StatusCode >= 400{
 			e.Config.Logger.Println(
 				LOG_ERROR,
-				fmt.Sprintf("unable to send event %s to %s. Failed with response status %d", event_name, url, res.StatusCode),
+				fmt.Sprintf("unable to send event %s to %s. Failed with response status %d", event_type, url, res.StatusCode),
 			)
 		}
 		res.Body.Close()
 	} else{
-		e.Config.Logger.Println(LOG_ERROR, "unable to send event %s to %s. Internal SDK error", event_name, url)
+		e.Config.Logger.Println(LOG_ERROR, "unable to send event %s to %s. Internal SDK error", event_type, url)
 	}
 
 }
