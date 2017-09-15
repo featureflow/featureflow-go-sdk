@@ -4,7 +4,7 @@ package featureflow
 type Evaluate struct {
 	feature_key string
 	evaluated_variant string
-	user User
+	user *User
 	eventsClient EventsClient
 }
 

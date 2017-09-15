@@ -9,7 +9,7 @@ import (
 
 type userBuilderTestContextType struct {
 	user_builder UserBuilder
-	user         User
+	user         *User
 	error			error
 }
 

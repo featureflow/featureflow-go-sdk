@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-func ruleMatches(rule rule, user User) bool{
+func ruleMatches(rule rule, user *User) bool{
 	if rule.DefaultRule == true{
 		return true
 	} else {

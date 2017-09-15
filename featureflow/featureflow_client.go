@@ -74,7 +74,7 @@ func (client *FeatureflowClient) EvaluateBasic(key, userId string) Evaluate{
 	return client.Evaluate(key, user)
 }
 
-func (client *FeatureflowClient) Evaluate(key string, user User) Evaluate {
+func (client *FeatureflowClient) Evaluate(key string, user *User) Evaluate {
 	feature, error := client.Config.FeatureStore.Get(key)
 
 	var evaluatedVariant string = "off"

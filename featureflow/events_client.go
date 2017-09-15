@@ -23,14 +23,14 @@ func (e*EventsClient) registerFeaturesEvent(features []FeatureRegistration){
 }
 
 type evaluateEventType struct{
-	FeatureKey string `json:"featureKey"`
-	EvaluatedVariant string `json:"evaluatedVariant"`
-	ExpectedVariant string `json:"expectedVariant"`
-	Timestamp time.Time `json:"timestamp""`
-	User User `json:"user"`
+	FeatureKey string 			`json:"featureKey"`
+	EvaluatedVariant string 	`json:"evaluatedVariant"`
+	ExpectedVariant string 		`json:"expectedVariant"`
+	Timestamp time.Time 		`json:"timestamp""`
+	User *User 					`json:"user"`
 }
 
-func (e*EventsClient) evaluateEvent(key, evaluatedVariant, expectedVariant string, user User){
+func (e*EventsClient) evaluateEvent(key, evaluatedVariant, expectedVariant string, user *User){
 	if e.Config.DisableEvents{
 		return
 	}

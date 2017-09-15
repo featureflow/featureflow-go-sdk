@@ -7,17 +7,11 @@ import (
 
 type Attribute interface{}
 
-type User interface {
-	GetId() string
-	GetAttributes() map[string][]Attribute
-	GetAttributesForKey(string) []Attribute
-	GetAttributeKeys() []string
-}
 
 type UserBuilder interface {
 	WithAttribute(string, Attribute) UserBuilder
 	WithAttributes(string, []Attribute) UserBuilder
-	Build() (User, error)
+	Build() (*User, error)
 }
 
 type userBuilder struct {
@@ -25,9 +19,9 @@ type userBuilder struct {
 	attributes map[string][]Attribute
 }
 
-type user struct{
-	id string `json:"id"`
-	attributes map[string][]Attribute `json:"attributes"`
+type User struct{
+	Id string `json:"id"`
+	Attributes map[string][]Attribute `json:"attributes"`
 }
 
 func (cb *userBuilder) WithAttribute(key string, attribute Attribute) UserBuilder {
@@ -40,13 +34,13 @@ func (cb *userBuilder) WithAttributes(Key string, Attributes []Attribute) UserBu
 	return cb
 }
 
-func (cb *userBuilder) Build() (User, error) {
+func (cb *userBuilder) Build() (*User, error) {
 	if len(cb.id) == 0 {
-		return &user{}, errors.New("A user id is required")
+		return &User{}, errors.New("A user id is required")
 	}
-	return &user{
-		id: cb.id,
-		attributes: cb.attributes,
+	return &User{
+		Id: cb.id,
+		Attributes: cb.attributes,
 	}, nil
 }
 
@@ -60,21 +54,21 @@ func NewUserBuilder(Id string) UserBuilder {
 	}
 }
 
-func (c *user) GetId() string {
-	return c.id
+func (c *User) GetId() string {
+	return c.Id
 }
 
-func (c *user) GetAttributes() map[string][]Attribute {
-	return c.attributes
+func (c *User) GetAttributes() map[string][]Attribute {
+	return c.Attributes
 }
 
-func (c *user) GetAttributesForKey(key string) []Attribute {
-	return c.attributes[key]
+func (c *User) GetAttributesForKey(key string) []Attribute {
+	return c.Attributes[key]
 }
 
-func (c *user) GetAttributeKeys() []string {
+func (c *User) GetAttributeKeys() []string {
 	attributeKeys := []string{}
-	for key, _ := range c.attributes{
+	for key, _ := range c.Attributes{
 		attributeKeys = append(attributeKeys, key)
 	}
 	return attributeKeys
