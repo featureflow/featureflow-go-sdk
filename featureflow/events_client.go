@@ -40,11 +40,11 @@ func (e*EventsClient) evaluateEvent(key, evaluatedVariant, expectedVariant strin
 			{key, "evaluate", evaluatedVariant, expectedVariant, time.Now(),user},
 		},
 	)
-	go e.sendEvent("evaluate", http.MethodPost, e.Config.BaseURL+"/api/sdk/v1/events", body)
+	go e.sendEvent(http.MethodPost, e.Config.BaseURL+"/api/sdk/v1/events", body)
 }
 
 
-func (e*EventsClient) sendEvent(event_type, method, url string, body []byte){
+func (e*EventsClient) sendEvent(method, url string, body []byte){
 	client := http.Client{
 		Timeout: time.Second * 5,
 	}
@@ -62,12 +62,12 @@ func (e*EventsClient) sendEvent(event_type, method, url string, body []byte){
 		if res.StatusCode >= 400{
 			e.Config.Logger.Println(
 				LOG_ERROR,
-				fmt.Sprintf("unable to send event %s to %s. Failed with response status %d", event_type, url, res.StatusCode),
+				fmt.Sprintf("unable to send event %s to %s. Failed with response status %d", body, url, res.StatusCode),
 			)
 		}
 		res.Body.Close()
 	} else{
-		e.Config.Logger.Println(LOG_ERROR, "unable to send event %s to %s. Internal SDK error", event_type, url)
+		e.Config.Logger.Println(LOG_ERROR, "unable to send event %s to %s. Internal SDK error", body, url)
 	}
 
 }
