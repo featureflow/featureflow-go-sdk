@@ -26,6 +26,7 @@ type evaluateEventType struct{
 	FeatureKey string `json:"featureKey"`
 	EvaluatedVariant string `json:"evaluatedVariant"`
 	ExpectedVariant string `json:"expectedVariant"`
+	Timestamp time.Time `json:"timestamp""`
 	User User `json:"user"`
 }
 
@@ -35,7 +36,7 @@ func (e*EventsClient) evaluateEvent(key, evaluatedVariant, expectedVariant strin
 	}
 	body, _ := json.Marshal(
 		[]evaluateEventType{
-			{key, evaluatedVariant, expectedVariant, user},
+			{key, evaluatedVariant, expectedVariant, time.Now(),user},
 		},
 	)
 	go e.sendEvent("evaluate", http.MethodPost, e.Config.BaseURL+"/api/sdk/v1/events", body)

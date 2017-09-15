@@ -9,6 +9,7 @@ type Attribute interface{}
 
 type User interface {
 	GetId() string
+	GetAttributes() map[string][]Attribute
 	GetAttributesForKey(string) []Attribute
 	GetAttributeKeys() []string
 }
@@ -61,6 +62,10 @@ func NewUserBuilder(Id string) UserBuilder {
 
 func (c *user) GetId() string {
 	return c.id
+}
+
+func (c *user) GetAttributes() map[string][]Attribute {
+	return c.attributes
 }
 
 func (c *user) GetAttributesForKey(key string) []Attribute {
