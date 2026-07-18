@@ -1,10 +1,11 @@
 package featureflow
 
 import (
-	"github.com/DATA-DOG/godog"
-	"github.com/DATA-DOG/godog/gherkin"
+	"context"
 	"fmt"
 	"strings"
+
+	"github.com/cucumber/godog"
 )
 
 type userBuilderTestContextType struct {
@@ -51,7 +52,7 @@ func theResultUserShouldHaveNoAttributes() error {
 	return nil
 }
 
-func theBuilderIsGivenTheFollowingAttributes(attributesTable *gherkin.DataTable) error {
+func theBuilderIsGivenTheFollowingAttributes(attributesTable *godog.Table) error {
 	head := attributesTable.Rows[0].Cells
 
 	for i := 1; i < len(attributesTable.Rows); i++ {
@@ -87,17 +88,18 @@ func theBuilderShouldThrowAnError() error {
 	return nil
 }
 
-func FeatureContext(s *godog.Suite) {
-	s.Step(`^there is access to the Context Builder module$`, thereIsAccessToTheUserBuilderModule)
-	s.Step(`^the builder is initialised with the id "([^"]*)"$`, theBuilderIsInitialisedWithTheId)
-	s.Step(`^the user is built using the builder$`, theUserIsBuiltUsingTheBuilder)
-	s.Step(`^the result user should have an id "([^"]*)"$`, theResultUserShouldHaveAnId)
-	s.Step(`^the result user should have no attributes$`, theResultUserShouldHaveNoAttributes)
-	s.Step(`^the builder is given the following attributes$`, theBuilderIsGivenTheFollowingAttributes)
-	s.Step(`^the result user should have the key "([^"]*)" with attribute "([^"]*)"$`, theResultUserShouldHaveTheKeyWithAttribute)
-	s.Step(`^the builder should throw an error$`, theBuilderShouldThrowAnError)
+func UserBuilderFeatureContext(ctx *godog.ScenarioContext) {
+	ctx.Step(`^there is access to the Context Builder module$`, thereIsAccessToTheUserBuilderModule)
+	ctx.Step(`^the builder is initialised with the id "([^"]*)"$`, theBuilderIsInitialisedWithTheId)
+	ctx.Step(`^the user is built using the builder$`, theUserIsBuiltUsingTheBuilder)
+	ctx.Step(`^the result user should have an id "([^"]*)"$`, theResultUserShouldHaveAnId)
+	ctx.Step(`^the result user should have no attributes$`, theResultUserShouldHaveNoAttributes)
+	ctx.Step(`^the builder is given the following attributes$`, theBuilderIsGivenTheFollowingAttributes)
+	ctx.Step(`^the result user should have the key "([^"]*)" with attribute "([^"]*)"$`, theResultUserShouldHaveTheKeyWithAttribute)
+	ctx.Step(`^the builder should throw an error$`, theBuilderShouldThrowAnError)
 
-	s.BeforeScenario(func(interface{}){
+	ctx.Before(func(c context.Context, sc *godog.Scenario) (context.Context, error) {
 		userBuilderTestContext = userBuilderTestContextType{}
+		return c, nil
 	})
 }

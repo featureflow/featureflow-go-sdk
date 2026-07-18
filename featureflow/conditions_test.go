@@ -1,11 +1,13 @@
 package featureflow
 
 import (
-	"github.com/DATA-DOG/godog"
+	"context"
 	"errors"
 	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/cucumber/godog"
 )
 
 type conditionsContextType struct {
@@ -75,14 +77,15 @@ func theValueIsAnArrayOfValues(valuesString string) error {
 	return nil
 }
 
-func ConditionsFeatureContext(s *godog.Suite) {
-	s.Step(`^the target is a "([^"]*)" with the value of "([^"]*)"$`, theTargetIsAWithTheValueOf)
-	s.Step(`^the value is a "([^"]*)" with the value of "([^"]*)"$`, theValueIsAWithTheValueOf)
-	s.Step(`^the operator test "([^"]*)" is run$`, theOperatorTestIsRun)
-	s.Step(`^the output should equal "([^"]*)"$`, theOutputShouldEqual)
-	s.Step(`^the value is an array of values "([^"]*)"$`, theValueIsAnArrayOfValues)
+func ConditionsFeatureContext(ctx *godog.ScenarioContext) {
+	ctx.Step(`^the target is a "([^"]*)" with the value of "([^"]*)"$`, theTargetIsAWithTheValueOf)
+	ctx.Step(`^the value is a "([^"]*)" with the value of "([^"]*)"$`, theValueIsAWithTheValueOf)
+	ctx.Step(`^the operator test "([^"]*)" is run$`, theOperatorTestIsRun)
+	ctx.Step(`^the output should equal "([^"]*)"$`, theOutputShouldEqual)
+	ctx.Step(`^the value is an array of values "([^"]*)"$`, theValueIsAnArrayOfValues)
 
-	s.BeforeScenario(func(interface{}) {
+	ctx.Before(func(c context.Context, sc *godog.Scenario) (context.Context, error) {
 		conditionsTestContext = conditionsContextType{}
+		return c, nil
 	})
 }

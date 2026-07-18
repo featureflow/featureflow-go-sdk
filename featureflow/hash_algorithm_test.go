@@ -1,8 +1,9 @@
 package featureflow
 
 import (
-	"github.com/DATA-DOG/godog"
 	"fmt"
+
+	"github.com/cucumber/godog"
 )
 
 type hashAlgorithmContextType struct {
@@ -49,9 +50,9 @@ func theResultFromTheVariantCalculationShouldBe(result float64) error {
 	return nil
 }
 
-func HashAlgorithmFeatureContext(s *godog.Suite) {
-	s.Step(`^the salt is "([^"]*)", the feature is "([^"]*)" and the user id is "([^"]*)"$`, theSaltIsTheFeatureIsAndTheUserIdIs)
-	s.Step(`^the variant value is calculated$`, theVariantValueIsCalculated)
-	s.Step(`^the hash value calculated should equal "([^"]*)"$`, theHashValueCalculatedShouldEqual)
-	s.Step(`^the result from the variant calculation should be (\d+)$`, theResultFromTheVariantCalculationShouldBe)
+func HashAlgorithmFeatureContext(ctx *godog.ScenarioContext) {
+	ctx.Step(`^the salt is "([^"]*)", the feature is "([^"]*)" and the user id is "([^"]*)"$`, theSaltIsTheFeatureIsAndTheUserIdIs)
+	ctx.Step(`^the variant value is calculated$`, theVariantValueIsCalculated)
+	ctx.Step(`^the hash value calculated should equal "([^"]*)"$`, theHashValueCalculatedShouldEqual)
+	ctx.Step(`^the result from the variant calculation should be (\d+)$`, theResultFromTheVariantCalculationShouldBe)
 }

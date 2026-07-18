@@ -26,7 +26,7 @@ type evaluateEventType struct{
 	EventType string 			`json:"type"`
 	EvaluatedVariant string 	`json:"evaluatedVariant"`
 	ExpectedVariant string 		`json:"expectedVariant"`
-	Timestamp time.Time 		`json:"timestamp""`
+	Timestamp time.Time 		`json:"timestamp"`
 	User *User 					`json:"user"`
 }
 

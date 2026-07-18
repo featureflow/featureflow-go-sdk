@@ -1,11 +1,12 @@
 package featureflow
 
 import (
-	"github.com/DATA-DOG/godog"
-	"github.com/DATA-DOG/godog/gherkin"
+	"context"
+	"encoding/json"
 	"fmt"
 	"strconv"
-	"encoding/json"
+
+	"github.com/cucumber/godog"
 )
 
 
@@ -45,7 +46,7 @@ func theResultFromTheMatchShouldBe(resultStr string) error {
 	return nil
 }
 
-func theUserAttributesAre(userAttributesTable *gherkin.DataTable) error {
+func theUserAttributesAre(userAttributesTable *godog.Table) error {
 
 	head := userAttributesTable.Rows[0].Cells
 
@@ -76,7 +77,7 @@ func theUserAttributesAre(userAttributesTable *gherkin.DataTable) error {
 	return nil
 }
 
-func theRulesAudienceConditionsAre(audienceConditions *gherkin.DataTable) error {
+func theRulesAudienceConditionsAre(audienceConditions *godog.Table) error {
 	head := audienceConditions.Rows[0].Cells
 	conditions := &rulesTestContext.rule.Audience.Conditions
 
@@ -106,7 +107,7 @@ func theVariantValueOf(variantValue float64) error {
 	return nil
 }
 
-func theVariantSplitsAre(variantSplits *gherkin.DataTable) error {
+func theVariantSplitsAre(variantSplits *godog.Table) error {
 	head := variantSplits.Rows[0].Cells
 	splits := &rulesTestContext.rule.VariantSplits
 
@@ -143,19 +144,18 @@ func theResultingVariantShouldBe(variant string) error {
 	return nil
 }
 
-func RulesFeatureContext(s *godog.Suite) {
-	s.Step(`^the rule is a default rule$`, theRuleIsADefaultRule)
-	s.Step(`^the rule is matched against the user$`, theRuleIsMatchedAgainstTheUser)
-	s.Step(`^the result from the match should be (true|false)$`, theResultFromTheMatchShouldBe)
-	s.Step(`^the user attributes are$`, theUserAttributesAre)
-	s.Step(`^the rule\'s audience conditions are$`, theRulesAudienceConditionsAre)
-	s.Step(`^the variant value of (\d+)$`, theVariantValueOf)
-	s.Step(`^the variant splits are$`, theVariantSplitsAre)
-	s.Step(`^the variant split key is calculated$`, theVariantSplitKeyIsCalculated)
-	s.Step(`^the resulting variant should be "([^"]*)"$`, theResultingVariantShouldBe)
+func RulesFeatureContext(ctx *godog.ScenarioContext) {
+	ctx.Step(`^the rule is a default rule$`, theRuleIsADefaultRule)
+	ctx.Step(`^the rule is matched against the user$`, theRuleIsMatchedAgainstTheUser)
+	ctx.Step(`^the result from the match should be (true|false)$`, theResultFromTheMatchShouldBe)
+	ctx.Step(`^the user attributes are$`, theUserAttributesAre)
+	ctx.Step(`^the rule\'s audience conditions are$`, theRulesAudienceConditionsAre)
+	ctx.Step(`^the variant value of (\d+)$`, theVariantValueOf)
+	ctx.Step(`^the variant splits are$`, theVariantSplitsAre)
+	ctx.Step(`^the variant split key is calculated$`, theVariantSplitKeyIsCalculated)
+	ctx.Step(`^the resulting variant should be "([^"]*)"$`, theResultingVariantShouldBe)
 
-
-	s.BeforeScenario(func(interface{}) {
+	ctx.Before(func(c context.Context, sc *godog.Scenario) (context.Context, error) {
 		rulesTestContext = rulesTestContextType{
 			rule: rule{
 				DefaultRule: false,
@@ -166,5 +166,6 @@ func RulesFeatureContext(s *godog.Suite) {
 			},
 			user_builder: NewUserBuilder("anonymous"),
 		}
+		return c, nil
 	})
 }

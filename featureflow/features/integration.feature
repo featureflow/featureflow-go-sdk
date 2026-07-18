@@ -1,8 +1,12 @@
+# Excluded from `go test ./...` by default (see TestFeatures in main_test.go).
+# Requires FEATUREFLOW_TEST_API_KEY (and optionally FEATUREFLOW_TEST_BASE_URL) to
+# point at an environment with a "test-integration" feature matching the Examples
+# below.
 @integration
 Feature: Integration
   Scenario Outline: Test that we can instantiate the client
     Given there is access to the Featureflow library
-    And the FeatureflowClient is initialized with the apiKey "srv-env-9b5fff890c724d119a334a64ed4d2eb2"
+    And the FeatureflowClient is initialized with the configured apiKey
     When the feature "<feature>" with user id "<userId>" is evaluated with the variant value "<variantValue>"
     Then the result of the evaluation should equal <result>
     Examples:
