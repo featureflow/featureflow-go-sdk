@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/cucumber/godog"
 )
@@ -73,10 +74,26 @@ func theBuilderIsGivenTheFollowingAttributes(attributesTable *godog.Table) error
 	return nil
 }
 
-func theResultUserShouldHaveTheKeyWithAttribute(key, attribute string) error {
-	userAttribute := userBuilderTestContext.user.GetAttributesForKey(key)[0]
-	if userAttribute != attribute{
-		return fmt.Errorf("Expected %s to be %s", userAttribute, attribute)
+func theResultUserShouldHaveAAttributeWithKeyAndValue(key, value string) error {
+	attrs := userBuilderTestContext.user.GetAttributesForKey(key)
+	if len(attrs) == 0 {
+		return fmt.Errorf("Expected user to have attribute %s, but it was not set", key)
+	}
+	userAttribute := fmt.Sprintf("%v", attrs[0])
+	if userAttribute != value {
+		return fmt.Errorf("Expected %s to be %s", userAttribute, value)
+	}
+	return nil
+}
+
+func theResultUserShouldHaveAAttributeWithKeyAndCurrentDatetimeInIso8601(key string) error {
+	attrs := userBuilderTestContext.user.GetAttributesForKey(key)
+	if len(attrs) == 0 {
+		return fmt.Errorf("Expected user to have attribute %s, but it was not set", key)
+	}
+	value := fmt.Sprintf("%v", attrs[0])
+	if _, err := time.Parse(time.RFC3339, value); err != nil {
+		return fmt.Errorf("Expected %s to be a valid ISO8601 datetime: %v", value, err)
 	}
 	return nil
 }
@@ -89,13 +106,14 @@ func theBuilderShouldThrowAnError() error {
 }
 
 func UserBuilderFeatureContext(ctx *godog.ScenarioContext) {
-	ctx.Step(`^there is access to the Context Builder module$`, thereIsAccessToTheUserBuilderModule)
+	ctx.Step(`^there is access to the User Builder module$`, thereIsAccessToTheUserBuilderModule)
 	ctx.Step(`^the builder is initialised with the id "([^"]*)"$`, theBuilderIsInitialisedWithTheId)
 	ctx.Step(`^the user is built using the builder$`, theUserIsBuiltUsingTheBuilder)
 	ctx.Step(`^the result user should have an id "([^"]*)"$`, theResultUserShouldHaveAnId)
 	ctx.Step(`^the result user should have no attributes$`, theResultUserShouldHaveNoAttributes)
 	ctx.Step(`^the builder is given the following attributes$`, theBuilderIsGivenTheFollowingAttributes)
-	ctx.Step(`^the result user should have the key "([^"]*)" with attribute "([^"]*)"$`, theResultUserShouldHaveTheKeyWithAttribute)
+	ctx.Step(`^the result user should have a attribute with key "([^"]*)" and value "([^"]*)"$`, theResultUserShouldHaveAAttributeWithKeyAndValue)
+	ctx.Step(`^the result user should have a attribute with key "([^"]*)" and current datetime in iso8601$`, theResultUserShouldHaveAAttributeWithKeyAndCurrentDatetimeInIso8601)
 	ctx.Step(`^the builder should throw an error$`, theBuilderShouldThrowAnError)
 
 	ctx.Before(func(c context.Context, sc *godog.Scenario) (context.Context, error) {

@@ -14,16 +14,24 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	ConditionsFeatureContext(ctx)
 	HashAlgorithmFeatureContext(ctx)
 	UserBuilderFeatureContext(ctx)
+	FeatureEvaluationFeatureContext(ctx)
 	IntegrationFeatureContext(ctx)
 }
 
-// TestFeatures runs every .feature file under features/ via `go test ./...`.
-// @integration scenarios hit a real Featureflow server and are excluded unless
+// TestFeatures runs the shared scenarios from ../testbed/gherkin (a submodule of
+// github.com/featureflow/featureflow-sdk-testbed) plus this repo's own
+// features/integration.feature, via `go test ./...`.
+//
+// @builder-defers-implicit-attributes is excluded: NewUserBuilder injects implicit
+// attributes (featureflow.user.id/date) immediately at construction time, not later
+// at evaluate time, so this SDK runs @builder-injects-implicit-attributes instead.
+// @json-value is excluded: not yet implemented in this SDK.
+// @integration hits a real Featureflow server and is excluded unless
 // FEATUREFLOW_TEST_API_KEY is set (see integration_test.go and features/integration.feature).
 func TestFeatures(t *testing.T) {
-	tags := "~@integration"
+	tags := "~@integration && ~@builder-defers-implicit-attributes && ~@json-value"
 	if os.Getenv("FEATUREFLOW_TEST_API_KEY") != "" {
-		tags = ""
+		tags = "~@builder-defers-implicit-attributes && ~@json-value"
 	}
 
 	suite := godog.TestSuite{
@@ -31,7 +39,7 @@ func TestFeatures(t *testing.T) {
 		ScenarioInitializer: InitializeScenario,
 		Options: &godog.Options{
 			Format:   "pretty",
-			Paths:    []string{"features"},
+			Paths:    []string{"../testbed/gherkin", "features/integration.feature"},
 			Tags:     tags,
 			TestingT: t,
 		},

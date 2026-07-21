@@ -3,6 +3,7 @@ package featureflow
 import (
 	"strings"
 	"regexp"
+	"time"
 )
 
 func conditionsTest(op string, a interface{}, b []interface{}) bool {
@@ -89,12 +90,25 @@ func lessThanOrEqual(a interface{}, b interface{}) bool{
 }
 
 //Dates
+// Compared by instant (RFC3339), not lexicographically — a naive string comparison
+// mishandles non-UTC offsets, e.g. "02:00-05:00" (07:00Z) sorts before "06:00Z" as a
+// string even though it's the later instant.
 func before(a interface{}, b interface{}) bool{
-	return a.(string) < b.(string)
+	aTime, aErr := time.Parse(time.RFC3339, a.(string))
+	bTime, bErr := time.Parse(time.RFC3339, b.(string))
+	if aErr != nil || bErr != nil {
+		return false
+	}
+	return aTime.Before(bTime)
 }
 
 func after(a interface{}, b interface{}) bool{
-	return a.(string) > b.(string)
+	aTime, aErr := time.Parse(time.RFC3339, a.(string))
+	bTime, bErr := time.Parse(time.RFC3339, b.(string))
+	if aErr != nil || bErr != nil {
+		return false
+	}
+	return aTime.After(bTime)
 }
 
 
