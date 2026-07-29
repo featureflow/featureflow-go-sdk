@@ -35,7 +35,7 @@ func theTargetIsAWithTheValueOf(targetType, target string) error {
 	return nil
 }
 
-func theValueIsAWithTheValueOf(valueType, value string) error {
+func theAttributeIsAWithTheValueOf(valueType, value string) error {
 	conditionsTestContext.valueType = valueType
 	if valueType == "number"{
 		if v, err := strconv.ParseFloat(value, 64); err != nil{
@@ -68,7 +68,7 @@ func theOutputShouldEqual(outputString string) error {
 	return nil
 }
 
-func theValueIsAnArrayOfValues(valuesString string) error {
+func theAttributeIsAnArrayOfValues(valuesString string) error {
 	var values = strings.Split(valuesString, ", ")
 	conditionsTestContext.values = make([]interface{}, len(values))
 	for i := range values {
@@ -79,10 +79,10 @@ func theValueIsAnArrayOfValues(valuesString string) error {
 
 func ConditionsFeatureContext(ctx *godog.ScenarioContext) {
 	ctx.Step(`^the target is a "([^"]*)" with the value of "([^"]*)"$`, theTargetIsAWithTheValueOf)
-	ctx.Step(`^the value is a "([^"]*)" with the value of "([^"]*)"$`, theValueIsAWithTheValueOf)
+	ctx.Step(`^the attribute is a "([^"]*)" with the value of "([^"]*)"$`, theAttributeIsAWithTheValueOf)
 	ctx.Step(`^the operator test "([^"]*)" is run$`, theOperatorTestIsRun)
 	ctx.Step(`^the output should equal "([^"]*)"$`, theOutputShouldEqual)
-	ctx.Step(`^the value is an array of values "([^"]*)"$`, theValueIsAnArrayOfValues)
+	ctx.Step(`^the attribute is an array of values "([^"]*)"$`, theAttributeIsAnArrayOfValues)
 
 	ctx.Before(func(c context.Context, sc *godog.Scenario) (context.Context, error) {
 		conditionsTestContext = conditionsContextType{}

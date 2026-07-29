@@ -53,11 +53,11 @@ go test ./featureflow -v
 Scenarios tagged `@integration` (see `featureflow/features/integration.feature`) hit a **real Featureflow environment** and are excluded from `go test ./...` by default. To run them, set an SDK key for an environment that has a `test-integration` feature configured to match the scenario examples:
 
 ```bash
-FEATUREFLOW_TEST_API_KEY=srv-env-<your_key> go test ./...
+FEATUREFLOW_TEST_API_KEY=sdk-srv-env-<your_key> go test ./...
 ```
 
 - **Staging / custom app host:** set `FEATUREFLOW_TEST_BASE_URL` to point the client somewhere other than the default `https://app.featureflow.io`, e.g.
-  `FEATUREFLOW_TEST_BASE_URL=https://beta.featureflow-staging.com FEATUREFLOW_TEST_API_KEY=srv-env-<key> go test ./...`
+  `FEATUREFLOW_TEST_BASE_URL=https://beta.featureflow-staging.com FEATUREFLOW_TEST_API_KEY=sdk-srv-env-<key> go test ./...`
 - Never hard-code real SDK keys in `.feature` files or step definitions — keys are always read from the environment.
 
 ## Manual test harness (example server)
@@ -65,13 +65,13 @@ FEATUREFLOW_TEST_API_KEY=srv-env-<your_key> go test ./...
 A small `net/http` app in [`examples/harness/`](examples/harness/) uses the SDK source from this repo directly — no build step needed:
 
 ```bash
-FEATUREFLOW_SERVER_KEY=srv-env-<your_key> go run ./examples/harness
+FEATUREFLOW_SERVER_KEY=sdk-srv-env-<your_key> go run ./examples/harness
 ```
 
 - Defaults to `http://127.0.0.1:3456/` (override with `PORT`). The home page can trigger evaluations in the browser; JSON endpoints: `GET /health`, `GET /api/config`, `GET /api/evaluate?feature=<key>&userId=<id>&role=<r>&tier=<t>`.
 - The harness turns off the events client by default (no calls to the events API). Set `FEATUREFLOW_DISABLE_EVENTS=false` to send evaluation events like a full production client.
 - **Staging / custom app host:** set `FEATUREFLOW_BASE_URL` to point somewhere other than the default `https://app.featureflow.io`. Example:
-  `FEATUREFLOW_BASE_URL=https://beta.featureflow-staging.com FEATUREFLOW_SERVER_KEY=srv-env-<key> go run ./examples/harness`
+  `FEATUREFLOW_BASE_URL=https://beta.featureflow-staging.com FEATUREFLOW_SERVER_KEY=sdk-srv-env-<key> go run ./examples/harness`
 - On startup the harness registers a `harness-demo` feature (failover `off`), so that key exists in your environment to experiment with.
 
 See [`examples/harness/README.md`](examples/harness/README.md) for details.

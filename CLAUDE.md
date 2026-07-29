@@ -19,7 +19,7 @@ There's no single-test flag for the BDD suite (it's one `TestFeatures` entry poi
 
 Integration scenarios in [features/integration.feature](featureflow/features/integration.feature) hit a real Featureflow server and are tagged `@integration`. They're skipped unless `FEATUREFLOW_TEST_API_KEY` (and optionally `FEATUREFLOW_TEST_BASE_URL`) is set — see the tag logic in [main_test.go](featureflow/main_test.go).
 
-Manual test harness (browser + JSON API against a real environment): `FEATUREFLOW_SERVER_KEY=srv-env-<key> go run ./examples/harness` — see [examples/harness/README.md](examples/harness/README.md).
+Manual test harness (browser + JSON API against a real environment): `FEATUREFLOW_SERVER_KEY=sdk-srv-env-<key> go run ./examples/harness` — see [examples/harness/README.md](examples/harness/README.md).
 
 ## Architecture
 

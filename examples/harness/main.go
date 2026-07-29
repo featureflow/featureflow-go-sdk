@@ -1,7 +1,7 @@
 // Local harness: net/http app using the SDK from this repo.
 //
-//	FEATUREFLOW_SERVER_KEY=srv-env-xxx go run ./examples/harness
-//	FEATUREFLOW_BASE_URL=https://beta.featureflow-staging.com FEATUREFLOW_SERVER_KEY=srv-env-xxx go run ./examples/harness
+//	FEATUREFLOW_SERVER_KEY=sdk-srv-env-xxx go run ./examples/harness
+//	FEATUREFLOW_BASE_URL=https://beta.featureflow-staging.com FEATUREFLOW_SERVER_KEY=sdk-srv-env-xxx go run ./examples/harness
 //
 // Open http://127.0.0.1:3456/ — or use the JSON API below.
 package main
@@ -42,7 +42,7 @@ func main() {
 	if apiKey == "" {
 		fmt.Fprintln(os.Stderr, "Set FEATUREFLOW_SERVER_KEY to your Featureflow server API key.")
 		fmt.Fprintln(os.Stderr, "Example:")
-		fmt.Fprintln(os.Stderr, "  FEATUREFLOW_SERVER_KEY=srv-env-xxxxxxxxx go run ./examples/harness")
+		fmt.Fprintln(os.Stderr, "  FEATUREFLOW_SERVER_KEY=sdk-srv-env-xxxxxxxxx go run ./examples/harness")
 		os.Exit(1)
 	}
 

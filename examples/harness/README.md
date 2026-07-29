@@ -4,10 +4,10 @@ Small `net/http` app in `main.go` that uses the SDK source from this repo direct
 
 ```bash
 # from the repo root
-FEATUREFLOW_SERVER_KEY=srv-env-<your_key> go run ./examples/harness
+FEATUREFLOW_SERVER_KEY=sdk-srv-env-<your_key> go run ./examples/harness
 
 # Staging / custom app host
-FEATUREFLOW_BASE_URL=https://beta.featureflow-staging.com FEATUREFLOW_SERVER_KEY=srv-env-<your_key> go run ./examples/harness
+FEATUREFLOW_BASE_URL=https://beta.featureflow-staging.com FEATUREFLOW_SERVER_KEY=sdk-srv-env-<your_key> go run ./examples/harness
 ```
 
 Then open <http://127.0.0.1:3456/> to evaluate features from the browser, or use the JSON API:
@@ -20,7 +20,7 @@ Then open <http://127.0.0.1:3456/> to evaluate features from the browser, or use
 
 Environment variables:
 
-- `FEATUREFLOW_SERVER_KEY` (required) — server SDK key (`srv-env-…`).
+- `FEATUREFLOW_SERVER_KEY` (required) — server SDK key (`sdk-srv-env-…`).
 - `FEATUREFLOW_BASE_URL` — override the default `https://app.featureflow.io`.
 - `FEATUREFLOW_DISABLE_EVENTS` — the harness disables the events API by default; set to `false` to send evaluation events like a production client.
 - `PORT` — listen port (default `3456`).

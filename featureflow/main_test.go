@@ -38,9 +38,14 @@ func TestFeatures(t *testing.T) {
 		Name:                "featureflow",
 		ScenarioInitializer: InitializeScenario,
 		Options: &godog.Options{
-			Format:   "pretty",
-			Paths:    []string{"../testbed/gherkin", "features/integration.feature"},
-			Tags:     tags,
+			Format: "pretty",
+			Paths:  []string{"../testbed/gherkin", "features/integration.feature"},
+			Tags:   tags,
+			// Without Strict, a scenario whose steps have no matching definition is reported as
+			// "undefined" and the suite still exits zero. The testbed is a submodule, so a step
+			// renamed upstream silently stops being tested here — which is how the whole of
+			// conditions.feature came to be skipped while `go test` stayed green.
+			Strict:   true,
 			TestingT: t,
 		},
 	}

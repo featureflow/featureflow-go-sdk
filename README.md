@@ -8,7 +8,7 @@ package main
 
 import "github.com/featureflow/featureflow-go-sdk/featureflow"
 
-var client, _ = featureflow.Client("srv-env-<api_key>", featureflow.Config{})
+var client, _ = featureflow.Client("sdk-srv-env-<api_key>", featureflow.Config{})
 ```
 
 Evaluate using
@@ -20,9 +20,9 @@ import "github.com/featureflow/featureflow-go-sdk/featureflow"
 
 //Get user somewhere in your code
 func main(){ 
-    client, _ := featureflow.Client("srv-env-<api_key>", featureflow.Config{})
+    client, _ := featureflow.Client("sdk-srv-env-<api_key>", featureflow.Config{})
     user, _ := featureflow.NewUserBuilder("userId").
-                               WithAttributes("roles", []string{"admin", "user"}).
+                               WithAttributes("roles", []featureflow.Attribute{"admin", "user"}).
                                WithAttribute("age", 20).
                                Build()
                  

@@ -16,7 +16,7 @@ type hashAlgorithmContextType struct {
 
 var hashAlgorithmContext hashAlgorithmContextType
 
-func theSaltIsTheFeatureIsAndTheUserIdIs(salt, feature, userId string) error {
+func theSaltIsTheFeatureIsAndTheIdIs(salt, feature, userId string) error {
 	hashAlgorithmContext = hashAlgorithmContextType{
 		salt: salt,
 		feature: feature,
@@ -51,7 +51,7 @@ func theResultFromTheVariantCalculationShouldBe(result float64) error {
 }
 
 func HashAlgorithmFeatureContext(ctx *godog.ScenarioContext) {
-	ctx.Step(`^the salt is "([^"]*)", the feature is "([^"]*)" and the user id is "([^"]*)"$`, theSaltIsTheFeatureIsAndTheUserIdIs)
+	ctx.Step(`^the salt is "([^"]*)", the feature is "([^"]*)" and the id is "([^"]*)"$`, theSaltIsTheFeatureIsAndTheIdIs)
 	ctx.Step(`^the variant value is calculated$`, theVariantValueIsCalculated)
 	ctx.Step(`^the hash value calculated should equal "([^"]*)"$`, theHashValueCalculatedShouldEqual)
 	ctx.Step(`^the result from the variant calculation should be (\d+)$`, theResultFromTheVariantCalculationShouldBe)
