@@ -3,6 +3,7 @@ package featureflow
 import (
 	"context"
 	"os"
+	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -22,10 +23,87 @@ import (
 const testTimezone = "Asia/Tokyo"
 
 // minScenarios is the floor below which the BDD suite is assumed to have stopped
-// running rather than to have legitimately shrunk. 93 scenarios run today; raise this
+// running rather than to have legitimately shrunk. 101 scenarios run today; raise this
 // if the testbed grows substantially, but never lower it to match a sudden drop
 // without first working out where the missing scenarios went.
-const minScenarios = 90
+const minScenarios = 98
+
+// The shared testbed carries scenarios for behaviour this SDK does not implement, so the
+// feature files are listed rather than globbed. A list on its own trades one silent failure
+// for another — a file added upstream would simply never run — so every file in the testbed
+// must appear in exactly one of these two sets, and TestTestbedFeatureFilesAreAccountedFor
+// fails on any that does not. Moving a file from unsupported to supported is then a
+// deliberate act with a visible diff.
+var (
+	supportedFeatures = []string{
+		"bucketing.feature",
+		"conditions.feature",
+		"feature_evaluation.feature",
+		"json_value.feature", // present but tag-excluded; see TestFeatures
+		"rules.feature",
+		"user_builder.feature",
+	}
+
+	// Each entry names the backlog item that would close the gap, so an unimplemented
+	// suite cannot quietly become permanent.
+	unsupportedFeatures = map[string]string{
+		"events.feature":            "client-side event summarisation is not implemented in this SDK",
+		"goals.feature":             "goal tracking is not implemented in this SDK (SDK-BACKLOG item 7)",
+		"sdk_config.feature":        "server-driven SDK config is not implemented in this SDK",
+		"tracked_exposures.feature": "per-flag exposure fidelity is not implemented in this SDK",
+	}
+)
+
+const testbedGherkin = "../testbed/gherkin"
+
+// TestTestbedFeatureFilesAreAccountedFor makes an upstream addition to the testbed a
+// build failure here rather than a silent omission. It is the counterpart to Strict:
+// Strict catches a step that stopped matching, this catches a whole file that was never
+// wired up.
+func TestTestbedFeatureFilesAreAccountedFor(t *testing.T) {
+	entries, err := os.ReadDir(testbedGherkin)
+	if err != nil {
+		t.Fatalf("cannot read %s — is the testbed submodule initialised? %v", testbedGherkin, err)
+	}
+
+	known := make(map[string]bool, len(supportedFeatures)+len(unsupportedFeatures))
+	for _, name := range supportedFeatures {
+		known[name] = true
+	}
+	for name := range unsupportedFeatures {
+		known[name] = true
+	}
+
+	seen := make(map[string]bool, len(entries))
+	for _, entry := range entries {
+		name := entry.Name()
+		if entry.IsDir() || !strings.HasSuffix(name, ".feature") {
+			continue
+		}
+		seen[name] = true
+		if !known[name] {
+			t.Errorf("testbed feature file %q is in neither supportedFeatures nor "+
+				"unsupportedFeatures — add step definitions and list it as supported, or "+
+				"record why it is not implemented here", name)
+		}
+	}
+
+	for name := range known {
+		if !seen[name] {
+			t.Errorf("feature file %q is listed here but no longer exists in the testbed — "+
+				"it was probably renamed upstream", name)
+		}
+	}
+}
+
+// featurePaths returns the absolute set of feature files godog should run.
+func featurePaths() []string {
+	paths := make([]string, 0, len(supportedFeatures)+1)
+	for _, name := range supportedFeatures {
+		paths = append(paths, testbedGherkin+"/"+name)
+	}
+	return append(paths, "features/integration.feature")
+}
 
 // TestMain pins the process timezone for the whole test binary. Doing it here rather
 // than in a per-test helper means a new test file cannot opt out by forgetting to call
@@ -86,7 +164,7 @@ func TestFeatures(t *testing.T) {
 		ScenarioInitializer: initializer,
 		Options: &godog.Options{
 			Format: "pretty",
-			Paths:  []string{"../testbed/gherkin", "features/integration.feature"},
+			Paths:  featurePaths(),
 			Tags:   tags,
 			// Without Strict, a scenario whose steps have no matching definition is reported as
 			// "undefined" and the suite still exits zero. The testbed is a submodule, so a step
