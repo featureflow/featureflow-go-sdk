@@ -1,6 +1,10 @@
 # featureflow-go-sdk
 Go Client for featureflow
 
+Installation
+```shell
+go get github.com/featureflow/featureflow-go-sdk@latest
+```
 
 Usage
 ```go
