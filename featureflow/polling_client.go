@@ -40,6 +40,10 @@ func getFeatures(api_key string, url string, etag *string, config *Config){
 
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", api_key))
 	req.Header.Set("If-None-Match", *etag)
+	if config.Application != ""{
+		// Write-only telemetry: never affects the response, so it cannot fragment the CDN cache.
+		req.Header.Set("X-Featureflow-Application", config.Application)
+	}
 
 	res, getErr := featureClient.Do(req)
 	if getErr != nil {

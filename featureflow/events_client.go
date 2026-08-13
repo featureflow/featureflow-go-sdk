@@ -55,6 +55,10 @@ func (e*EventsClient) sendEvent(method, url string, body []byte){
 
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", e.ApiKey))
 	req.Header.Set("X-Featureflow-Client", fmt.Sprintf("GoClient/1.0.0"))
+	if e.Config.Application != ""{
+		// Already sanitised by Client (see application.go).
+		req.Header.Set("X-Featureflow-Application", e.Config.Application)
+	}
 	res, _ := client.Do(req)
 
 	if res != nil {

@@ -23,7 +23,7 @@ import (
 const testTimezone = "Asia/Tokyo"
 
 // minScenarios is the floor below which the BDD suite is assumed to have stopped
-// running rather than to have legitimately shrunk. 101 scenarios run today; raise this
+// running rather than to have legitimately shrunk. 112 scenarios run today; raise this
 // if the testbed grows substantially, but never lower it to match a sudden drop
 // without first working out where the missing scenarios went.
 const minScenarios = 98
@@ -36,6 +36,7 @@ const minScenarios = 98
 // deliberate act with a visible diff.
 var (
 	supportedFeatures = []string{
+		"application_tag.feature",
 		"bucketing.feature",
 		"conditions.feature",
 		"feature_evaluation.feature",
@@ -127,6 +128,7 @@ func InitializeScenario(ctx *godog.ScenarioContext) {
 	HashAlgorithmFeatureContext(ctx)
 	UserBuilderFeatureContext(ctx)
 	FeatureEvaluationFeatureContext(ctx)
+	ApplicationTagFeatureContext(ctx)
 	IntegrationFeatureContext(ctx)
 }
 

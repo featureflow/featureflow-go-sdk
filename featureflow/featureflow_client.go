@@ -7,6 +7,7 @@ import (
 )
 
 const LOG_INFO = "[info]"
+const LOG_WARN = "[warn]"
 const LOG_ERROR = "[error]"
 
 type FeatureflowClient struct{
@@ -21,6 +22,7 @@ type Config struct {
 	FeatureStore FeatureStore
 	WithFeatures []FeatureRegistration
 	DisableEvents bool
+	Application string
 	Logger *log.Logger
 }
 
@@ -43,6 +45,14 @@ func Client(api_key string, config Config) (*FeatureflowClient, error){
 	if config.BaseURL == ""{
 		config.BaseURL = "https://app.featureflow.io"
 	}
+
+	// Optional workload name sent as X-Featureflow-Application on every request so
+	// usage and flag evaluations are attributable per application in the dashboard.
+	// A value set in code wins over the FEATUREFLOW_APPLICATION environment variable.
+	if config.Application == ""{
+		config.Application = os.Getenv("FEATUREFLOW_APPLICATION")
+	}
+	config.Application = sanitiseApplication(config.Application, config.Logger)
 
 	config.Logger.Println(LOG_INFO, fmt.Sprintf("Connecting to %s", config.BaseURL))
 
